@@ -1,0 +1,2793 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>English Flashcards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAFAF7;
+    --paper: #FFFFFF;
+    --ink: #1A1A1A;
+    --muted: #6B6B6B;
+    --line: #E6E4DD;
+    --accent: #2D5F5D;
+    --accent-soft: #E8EFEE;
+    --accent-b: #B48548;
+    --accent-b-soft: rgba(180, 133, 72, 0.08);
+    --success: #4A7A4E;
+    --success-soft: rgba(74, 122, 78, 0.08);
+    --warn: #9A4A4A;
+    --warn-soft: rgba(154, 74, 74, 0.08);
+    --shadow: 0 1px 2px rgba(20,20,20,0.04), 0 10px 30px rgba(20,20,20,0.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 24px 48px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand-mark {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+  .brand-mark em { font-style: italic; color: var(--accent); }
+  .session-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  .session-info span { color: var(--ink); }
+
+  /* Content mode toggle */
+  .modes {
+    display: flex;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 4px;
+    margin: 20px 0 0;
+    box-shadow: 0 1px 2px rgba(20,20,20,0.02);
+  }
+  .mode-btn {
+    flex: 1;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 8px;
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .mode-btn:hover:not(.active) { color: var(--ink); }
+  .mode-btn.active {
+    background: var(--ink);
+    color: var(--bg);
+    box-shadow: 0 1px 2px rgba(20,20,20,0.1);
+  }
+  .mode-btn svg { width: 15px; height: 15px; }
+
+  .levels {
+    display: flex;
+    gap: 6px;
+    padding: 16px 0 0;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 20px;
+  }
+  .level-btn {
+    flex: 1;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 8px 14px;
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .level-btn:hover { color: var(--ink); }
+  .level-btn.active { color: var(--ink); border-bottom-color: var(--accent); }
+  .level-btn .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .level-btn.active .tag { color: var(--accent); }
+
+  .categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 20px;
+  }
+  .cat {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 14px;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .cat:hover { color: var(--ink); border-color: var(--ink); }
+  .cat.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* Practice toggle */
+  .practice-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+  }
+  .practice-toggle {
+    display: inline-flex;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 3px;
+  }
+  .practice-toggle button {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 6px 12px;
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+  .practice-toggle button:hover:not(.active) { color: var(--ink); }
+  .practice-toggle button.active { background: var(--accent-soft); color: var(--accent); }
+  .practice-toggle svg { width: 13px; height: 13px; }
+
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .progress-row .count { color: var(--ink); }
+  .progress-bar {
+    height: 2px;
+    background: var(--line);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Card */
+  .card-wrap {
+    perspective: 1400px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+    margin-bottom: 20px;
+  }
+  .card {
+    position: relative;
+    width: 100%;
+    max-width: 540px;
+    aspect-ratio: 3 / 2;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .face {
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .face.back { transform: rotateY(180deg); }
+  .face-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .face-top .lang {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+  .face-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex: 1;
+    padding: 12px 0;
+  }
+  .word {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(32px, 6vw, 52px);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+  .translation {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(26px, 5vw, 40px);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--accent);
+  }
+  .phrase {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(20px, 3.4vw, 28px);
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+    color: var(--ink);
+    max-width: 95%;
+  }
+  .phrase-translation {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(18px, 3vw, 24px);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    color: var(--accent);
+    max-width: 95%;
+  }
+  .example {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 14px;
+    max-width: 92%;
+    font-style: italic;
+  }
+  .example strong { color: var(--ink); font-style: normal; font-weight: 500; }
+  .context {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 14px;
+    max-width: 92%;
+    padding: 8px 14px;
+    background: var(--bg);
+    border-left: 2px solid var(--accent);
+    text-align: left;
+    border-radius: 0 4px 4px 0;
+  }
+  .context::before {
+    content: 'Contexto · ';
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .face-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .speak-btn {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+  .speak-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .speak-btn svg { width: 14px; height: 14px; }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 14px 12px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn:hover { border-color: var(--ink); }
+  .btn.no { color: var(--warn); border-color: rgba(154, 74, 74, 0.25); }
+  .btn.no:hover { background: var(--warn-soft); border-color: var(--warn); }
+  .btn.yes { color: var(--success); border-color: rgba(74, 122, 78, 0.25); }
+  .btn.yes:hover { background: var(--success-soft); border-color: var(--success); }
+  .btn.flip { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .btn.flip:hover { background: #000; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn .kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    opacity: 0.5;
+    margin-left: 2px;
+  }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+  .nav-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 4px;
+    transition: color 0.15s ease;
+  }
+  .nav-btn:hover { color: var(--ink); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .stats {
+    display: flex;
+    gap: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+  .stats .val { color: var(--ink); font-weight: 500; }
+  .stats .yes-val { color: var(--success); }
+  .stats .no-val { color: var(--warn); }
+
+  /* Dictation */
+  .dict-panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 32px 28px;
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+  .dict-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .dict-top .badge {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+  .dict-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0 20px;
+  }
+  .dict-play {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 14px rgba(20,20,20,0.15);
+  }
+  .dict-play:hover { background: var(--accent); transform: scale(1.04); }
+  .dict-play:active { transform: scale(0.98); }
+  .dict-play.playing {
+    background: var(--accent);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  .dict-play svg { width: 32px; height: 32px; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(45, 95, 93, 0.35); }
+    50% { box-shadow: 0 0 0 14px rgba(45, 95, 93, 0); }
+  }
+  .dict-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .dict-hint span { color: var(--accent); }
+  .dict-input-wrap {
+    display: flex;
+    gap: 8px;
+    max-width: 480px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .dict-input {
+    flex: 1;
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  .dict-input::placeholder { color: var(--muted); font-style: italic; }
+  .dict-input:focus { border-color: var(--accent); background: var(--paper); }
+  .dict-input.correct { border-color: var(--success); background: var(--success-soft); color: var(--success); }
+  .dict-input.wrong { border-color: var(--warn); background: var(--warn-soft); color: var(--warn); }
+  .dict-check {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 22px;
+    background: var(--ink);
+    color: var(--bg);
+    border: 1px solid var(--ink);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .dict-check:hover { background: #000; }
+  .dict-feedback {
+    margin-top: 20px;
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    text-align: center;
+    max-width: 480px;
+    width: 100%;
+    display: none;
+  }
+  .dict-feedback.show { display: block; }
+  .dict-feedback.correct {
+    background: var(--success-soft);
+    color: var(--success);
+    border: 1px solid rgba(74, 122, 78, 0.2);
+  }
+  .dict-feedback.wrong {
+    background: var(--warn-soft);
+    color: var(--warn);
+    border: 1px solid rgba(154, 74, 74, 0.2);
+  }
+  .dict-feedback .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    display: block;
+    margin-top: 8px;
+    margin-bottom: 2px;
+  }
+  .dict-feedback .correct-answer {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink);
+    display: block;
+    margin-top: 2px;
+  }
+  .dict-feedback .your-answer {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    color: var(--warn);
+    text-decoration: line-through;
+    text-decoration-color: rgba(154, 74, 74, 0.4);
+    display: block;
+    margin-top: 2px;
+  }
+  .dict-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* ==========================================
+     DIALOGUE MODE
+     ========================================== */
+  .dlg-panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 28px 30px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .dlg-header {
+    padding-bottom: 18px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .dlg-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .dlg-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.15;
+  }
+  .dlg-desc {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .dlg-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  .dlg-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 14px;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dlg-btn:hover { border-color: var(--ink); }
+  .dlg-btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .dlg-btn.primary:hover { background: #000; }
+  .dlg-btn.playing { background: var(--accent); border-color: var(--accent); color: white; }
+  .dlg-btn svg { width: 13px; height: 13px; }
+
+  .dlg-turns {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .turn {
+    padding: 14px 16px;
+    border-radius: 6px;
+    background: var(--bg);
+    border-left: 3px solid var(--accent);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .turn:hover { background: var(--accent-soft); }
+  .turn.speaker-b {
+    border-left-color: var(--accent-b);
+    background: rgba(180, 133, 72, 0.04);
+  }
+  .turn.speaker-b:hover { background: var(--accent-b-soft); }
+  .turn.playing {
+    background: var(--accent-soft);
+    border-left-width: 4px;
+    box-shadow: 0 2px 8px rgba(45, 95, 93, 0.1);
+  }
+  .turn.speaker-b.playing { background: var(--accent-b-soft); }
+
+  .turn-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    gap: 12px;
+  }
+  .turn-speaker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .turn.speaker-b .turn-speaker { color: var(--accent-b); }
+  .turn-play {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+  .turn-play:hover {
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .turn.speaker-b .turn-play:hover {
+    color: var(--accent-b);
+    background: var(--accent-b-soft);
+  }
+  .turn-play svg { width: 12px; height: 12px; }
+  .turn-en {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    color: var(--ink);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+  .turn-es {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.4;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--line);
+    display: none;
+  }
+  .turn.revealed .turn-es { display: block; }
+
+  .dlg-hint {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 16px 0 4px;
+  }
+
+  /* Complete state */
+  .complete {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 48px 32px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .complete h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .complete p { color: var(--muted); margin-bottom: 24px; }
+  .complete-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .complete-stats div { color: var(--muted); }
+  .complete-stats .num {
+    font-family: 'Fraunces', serif;
+    font-size: 40px;
+    display: block;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .complete-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 520px) {
+    .app { padding: 20px 16px 32px; }
+    header { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .face { padding: 20px 18px; }
+    .actions { grid-template-columns: 1fr; }
+    .nav-row { flex-wrap: wrap; gap: 12px; }
+    .level-btn { font-size: 12px; }
+    .mode-btn { font-size: 12px; padding: 9px 4px; }
+    .card { aspect-ratio: 4 / 3; }
+    .dict-input-wrap { flex-direction: column; }
+    .dict-check { width: 100%; }
+    .dict-panel { padding: 24px 18px; }
+    .dlg-panel { padding: 22px 18px; }
+    .dlg-title { font-size: 22px; }
+    .turn-en { font-size: 15px; }
+    .turn-es { font-size: 14px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+    .progress-fill { transition: none; }
+    .dict-play.playing { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><div class="brand-mark">English <em>Flashcards</em></div></div>
+    <div class="session-info">NIVEL <span id="levelBadge">A1 · A2</span></div>
+  </header>
+
+  <div class="modes" id="modes">
+    <button class="mode-btn active" data-mode="words">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+      Palabras
+    </button>
+    <button class="mode-btn" data-mode="phrases">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      Frases
+    </button>
+    <button class="mode-btn" data-mode="dialogues">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+      </svg>
+      Diálogos
+    </button>
+  </div>
+
+  <div class="levels" id="levels"></div>
+  <div class="categories" id="categories"></div>
+
+  <div class="practice-row" id="practiceRow">
+    <div class="practice-toggle" id="practiceToggle">
+      <button data-practice="card" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+          <line x1="7" y1="10" x2="17" y2="10"></line>
+          <line x1="7" y1="14" x2="13" y2="14"></line>
+        </svg>
+        Tarjeta
+      </button>
+      <button data-practice="dictation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+          <path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"></path>
+        </svg>
+        Dictado
+      </button>
+    </div>
+  </div>
+
+  <div class="progress-row" id="progressRow">
+    <div>PROGRESO</div>
+    <div><span class="count" id="counter">0 / 0</span></div>
+  </div>
+  <div class="progress-bar" id="progressBarWrap"><div class="progress-fill" id="progressFill"></div></div>
+
+  <!-- CARD VIEW -->
+  <div id="cardView">
+    <div class="card-wrap">
+      <div class="card" id="card">
+        <div class="face front">
+          <div class="face-top"><span id="frontCategory">—</span><span class="lang">EN</span></div>
+          <div class="face-center" id="frontCenter"><div class="word" id="wordEn">—</div></div>
+          <div class="face-bottom">
+            <span id="frontHint">Toca para ver traducción</span>
+            <button class="speak-btn" id="speakBtn" title="Escuchar pronunciación" aria-label="Escuchar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="face back">
+          <div class="face-top"><span id="backCategory">—</span><span class="lang">ES</span></div>
+          <div class="face-center" id="backCenter"></div>
+          <div class="face-bottom"><span>Marca si la sabías</span><span id="cardIndex">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn no" id="btnNo">No sabía <span class="kbd">1</span></button>
+      <button class="btn flip" id="btnFlip">Voltear <span class="kbd">space</span></button>
+      <button class="btn yes" id="btnYes">Sabía <span class="kbd">2</span></button>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" id="prevBtn">← Anterior</button>
+      <div class="stats">
+        <div>Sabía <span class="val yes-val" id="statYes">0</span></div>
+        <div>No sabía <span class="val no-val" id="statNo">0</span></div>
+      </div>
+      <button class="nav-btn" id="nextBtn">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- DICTATION VIEW -->
+  <div id="dictView" style="display:none;">
+    <div class="dict-panel">
+      <div class="dict-top"><span id="dictCategory">—</span><span class="badge">DICTADO</span></div>
+      <div class="dict-body">
+        <button class="dict-play" id="dictPlay" title="Reproducir audio (S)" aria-label="Reproducir">
+          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20 7 4"/></svg>
+        </button>
+        <div class="dict-hint">Escucha con atención · <span>presiona el botón para repetir</span></div>
+        <div class="dict-input-wrap">
+          <input type="text" id="dictInput" class="dict-input" placeholder="Escribe lo que escuchas..."
+                 autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          <button class="dict-check" id="dictCheck">Verificar</button>
+        </div>
+        <div class="dict-feedback" id="dictFeedback"></div>
+      </div>
+      <div class="dict-bottom">
+        <div class="stats">
+          <div>Correctas <span class="val yes-val" id="dictStatYes">0</span></div>
+          <div>Falladas <span class="val no-val" id="dictStatNo">0</span></div>
+        </div>
+        <span id="dictIndex">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOGUE VIEW -->
+  <div id="dialogueView" style="display:none;">
+    <div class="dlg-panel">
+      <div class="dlg-header">
+        <div class="dlg-eyebrow" id="dlgEyebrow">ESCENARIO</div>
+        <h2 class="dlg-title" id="dlgTitle">—</h2>
+        <p class="dlg-desc" id="dlgDesc">—</p>
+      </div>
+      <div class="dlg-actions">
+        <button class="dlg-btn primary" id="btnPlayAll">
+          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          <span id="playAllLabel">Reproducir todo</span>
+        </button>
+        <button class="dlg-btn" id="btnRevealAll">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          <span id="revealAllLabel">Mostrar traducciones</span>
+        </button>
+      </div>
+      <div class="dlg-turns" id="dlgTurns"></div>
+      <div class="dlg-hint">Haz clic en cualquier turno para ver su traducción</div>
+    </div>
+  </div>
+
+  <!-- COMPLETE VIEW -->
+  <div id="completeView" style="display:none;">
+    <div class="complete">
+      <h2>Sesión completada</h2>
+      <p>Buen trabajo. Aquí está el resumen:</p>
+      <div class="complete-stats">
+        <div><span class="num" id="finalYes">0</span>Sabía</div>
+        <div><span class="num" id="finalNo">0</span>No sabía</div>
+        <div><span class="num" id="finalPct">0%</span>Acierto</div>
+      </div>
+      <div class="complete-actions">
+        <button class="btn" id="restartBtn">Reiniciar categoría</button>
+        <button class="btn" id="reviewBtn">Repasar solo las falladas</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  WORDS DATA
+// ============================================================
+const WORDS_DATA = {
+  basic: {
+    label: 'Básico', tag: 'A1 · A2',
+    categories: {
+      greetings: { label: 'Saludos', items: [
+        { en: 'Hello', es: 'Hola', ex: 'Hello, how are you?' },
+        { en: 'Goodbye', es: 'Adiós', ex: 'Goodbye, see you tomorrow.' },
+        { en: 'Thank you', es: 'Gracias', ex: 'Thank you for your help.' },
+        { en: 'Please', es: 'Por favor', ex: 'Please, come in.' },
+        { en: 'Yes', es: 'Sí', ex: 'Yes, I understand.' },
+        { en: 'No', es: 'No', ex: "No, I don't want it." },
+        { en: 'Sorry', es: 'Perdón', ex: "Sorry, I'm late." },
+        { en: 'Excuse me', es: 'Disculpa', ex: 'Excuse me, where is the bathroom?' },
+        { en: 'Good morning', es: 'Buenos días', ex: 'Good morning, everyone.' },
+        { en: 'Good night', es: 'Buenas noches', ex: 'Good night, sleep well.' }
+      ]},
+      family: { label: 'Familia', items: [
+        { en: 'Mother', es: 'Madre', ex: 'My mother is a teacher.' },
+        { en: 'Father', es: 'Padre', ex: 'My father works at home.' },
+        { en: 'Sister', es: 'Hermana', ex: 'I have one sister.' },
+        { en: 'Brother', es: 'Hermano', ex: 'My brother is tall.' },
+        { en: 'Son', es: 'Hijo', ex: 'Her son is five years old.' },
+        { en: 'Daughter', es: 'Hija', ex: 'Their daughter loves music.' },
+        { en: 'Grandmother', es: 'Abuela', ex: 'My grandmother cooks well.' },
+        { en: 'Grandfather', es: 'Abuelo', ex: 'My grandfather reads a lot.' },
+        { en: 'Family', es: 'Familia', ex: 'I love my family.' },
+        { en: 'Baby', es: 'Bebé', ex: 'The baby is sleeping.' }
+      ]},
+      food: { label: 'Comida', items: [
+        { en: 'Water', es: 'Agua', ex: 'I drink water every day.' },
+        { en: 'Bread', es: 'Pan', ex: 'I want bread with butter.' },
+        { en: 'Milk', es: 'Leche', ex: 'The milk is cold.' },
+        { en: 'Coffee', es: 'Café', ex: 'I love hot coffee.' },
+        { en: 'Apple', es: 'Manzana', ex: 'This apple is red.' },
+        { en: 'Chicken', es: 'Pollo', ex: 'We eat chicken for dinner.' },
+        { en: 'Rice', es: 'Arroz', ex: 'Rice is my favorite food.' },
+        { en: 'Egg', es: 'Huevo', ex: 'I want one egg, please.' },
+        { en: 'Cheese', es: 'Queso', ex: 'The cheese is delicious.' },
+        { en: 'Fruit', es: 'Fruta', ex: 'Fruit is healthy.' }
+      ]},
+      colors: { label: 'Colores', items: [
+        { en: 'Red', es: 'Rojo', ex: 'My car is red.' },
+        { en: 'Blue', es: 'Azul', ex: 'The sky is blue.' },
+        { en: 'Green', es: 'Verde', ex: 'Grass is green.' },
+        { en: 'Yellow', es: 'Amarillo', ex: 'The sun is yellow.' },
+        { en: 'Black', es: 'Negro', ex: 'I wear black shoes.' },
+        { en: 'White', es: 'Blanco', ex: 'The snow is white.' },
+        { en: 'Orange', es: 'Naranja', ex: 'The ball is orange.' },
+        { en: 'Purple', es: 'Morado', ex: 'She likes purple flowers.' },
+        { en: 'Pink', es: 'Rosa', ex: 'The dress is pink.' },
+        { en: 'Brown', es: 'Marrón', ex: 'The dog is brown.' }
+      ]},
+      numbers: { label: 'Números', items: [
+        { en: 'One', es: 'Uno', ex: 'I have one book.' },
+        { en: 'Two', es: 'Dos', ex: 'Two cats are playing.' },
+        { en: 'Three', es: 'Tres', ex: 'Three friends came.' },
+        { en: 'Four', es: 'Cuatro', ex: 'Four chairs, please.' },
+        { en: 'Five', es: 'Cinco', ex: 'Five minutes more.' },
+        { en: 'Ten', es: 'Diez', ex: 'Ten dollars, please.' },
+        { en: 'Twenty', es: 'Veinte', ex: 'I am twenty years old.' },
+        { en: 'Hundred', es: 'Cien', ex: 'One hundred people.' },
+        { en: 'First', es: 'Primero', ex: 'This is the first time.' },
+        { en: 'Last', es: 'Último', ex: 'The last day of school.' }
+      ]},
+      verbs: { label: 'Verbos', items: [
+        { en: 'To be', es: 'Ser / Estar', ex: 'I am a student.' },
+        { en: 'To have', es: 'Tener', ex: 'I have a dog.' },
+        { en: 'To go', es: 'Ir', ex: "Let's go home." },
+        { en: 'To eat', es: 'Comer', ex: 'I eat breakfast at 8.' },
+        { en: 'To drink', es: 'Beber', ex: 'I drink coffee daily.' },
+        { en: 'To sleep', es: 'Dormir', ex: 'Cats sleep a lot.' },
+        { en: 'To work', es: 'Trabajar', ex: 'I work in an office.' },
+        { en: 'To study', es: 'Estudiar', ex: 'I study English.' },
+        { en: 'To live', es: 'Vivir', ex: 'I live in Lima.' },
+        { en: 'To speak', es: 'Hablar', ex: 'I speak Spanish.' }
+      ]},
+      objects: { label: 'Objetos', items: [
+        { en: 'House', es: 'Casa', ex: 'My house is small.' },
+        { en: 'Car', es: 'Carro', ex: 'The car is new.' },
+        { en: 'Book', es: 'Libro', ex: 'This book is interesting.' },
+        { en: 'Phone', es: 'Teléfono', ex: 'My phone is dead.' },
+        { en: 'Table', es: 'Mesa', ex: 'The table is big.' },
+        { en: 'Chair', es: 'Silla', ex: 'This chair is comfortable.' },
+        { en: 'Door', es: 'Puerta', ex: 'Close the door, please.' },
+        { en: 'Window', es: 'Ventana', ex: 'Open the window.' },
+        { en: 'Bed', es: 'Cama', ex: 'My bed is soft.' },
+        { en: 'Key', es: 'Llave', ex: 'I lost my key.' }
+      ]},
+      time: { label: 'Tiempo', items: [
+        { en: 'Today', es: 'Hoy', ex: 'Today is Monday.' },
+        { en: 'Tomorrow', es: 'Mañana', ex: 'See you tomorrow.' },
+        { en: 'Yesterday', es: 'Ayer', ex: 'Yesterday was busy.' },
+        { en: 'Morning', es: 'Mañana', ex: 'I run every morning.' },
+        { en: 'Night', es: 'Noche', ex: 'The night is quiet.' },
+        { en: 'Week', es: 'Semana', ex: 'This week is short.' },
+        { en: 'Month', es: 'Mes', ex: 'Next month I travel.' },
+        { en: 'Year', es: 'Año', ex: 'Happy new year!' },
+        { en: 'Hour', es: 'Hora', ex: 'One hour is enough.' },
+        { en: 'Minute', es: 'Minuto', ex: 'Wait a minute, please.' }
+      ]},
+      animals: { label: 'Animales', items: [
+        { en: 'Dog', es: 'Perro', ex: 'My dog is friendly.' },
+        { en: 'Cat', es: 'Gato', ex: 'The cat sleeps all day.' },
+        { en: 'Bird', es: 'Pájaro', ex: 'A bird is singing.' },
+        { en: 'Fish', es: 'Pez', ex: 'This fish is small.' },
+        { en: 'Horse', es: 'Caballo', ex: 'The horse runs fast.' },
+        { en: 'Cow', es: 'Vaca', ex: 'The cow gives milk.' },
+        { en: 'Chicken', es: 'Pollo/Gallina', ex: 'The chicken lays eggs.' },
+        { en: 'Rabbit', es: 'Conejo', ex: 'The rabbit is white.' },
+        { en: 'Mouse', es: 'Ratón', ex: 'A mouse ran across the floor.' },
+        { en: 'Bear', es: 'Oso', ex: 'The bear lives in the forest.' }
+      ]}
+    }
+  },
+  medium: {
+    label: 'Intermedio', tag: 'B1 · B2',
+    categories: {
+      work: { label: 'Trabajo', items: [
+        { en: 'Meeting', es: 'Reunión', ex: 'The meeting starts at 9 AM.' },
+        { en: 'Deadline', es: 'Fecha límite', ex: 'The deadline is next Friday.' },
+        { en: 'Employee', es: 'Empleado', ex: 'Every employee gets a bonus.' },
+        { en: 'Salary', es: 'Salario', ex: 'She got a salary raise.' },
+        { en: 'Interview', es: 'Entrevista', ex: 'The interview went well.' },
+        { en: 'Manager', es: 'Gerente', ex: 'My manager is very kind.' },
+        { en: 'Report', es: 'Informe', ex: 'Send me the report today.' },
+        { en: 'Schedule', es: 'Horario', ex: 'Check the schedule online.' },
+        { en: 'Colleague', es: 'Colega', ex: 'My colleague helped me a lot.' },
+        { en: 'Client', es: 'Cliente', ex: 'The client is happy with our work.' }
+      ]},
+      travel: { label: 'Viajes', items: [
+        { en: 'Airport', es: 'Aeropuerto', ex: 'The airport is far from here.' },
+        { en: 'Luggage', es: 'Equipaje', ex: "Don't forget your luggage." },
+        { en: 'Passport', es: 'Pasaporte', ex: 'I need to renew my passport.' },
+        { en: 'Flight', es: 'Vuelo', ex: 'Our flight was delayed.' },
+        { en: 'Ticket', es: 'Boleto', ex: 'I bought a round-trip ticket.' },
+        { en: 'Hotel', es: 'Hotel', ex: 'The hotel has a beautiful view.' },
+        { en: 'Reservation', es: 'Reserva', ex: 'I made a reservation for two.' },
+        { en: 'Border', es: 'Frontera', ex: 'We crossed the border yesterday.' },
+        { en: 'Journey', es: 'Viaje', ex: 'It was a long journey.' },
+        { en: 'Sightseeing', es: 'Turismo', ex: 'We went sightseeing in Paris.' }
+      ]},
+      emotions: { label: 'Emociones', items: [
+        { en: 'Happy', es: 'Feliz', ex: 'She feels happy today.' },
+        { en: 'Sad', es: 'Triste', ex: 'He looks sad.' },
+        { en: 'Excited', es: 'Emocionado', ex: "I'm excited about the trip." },
+        { en: 'Worried', es: 'Preocupado', ex: "She's worried about the exam." },
+        { en: 'Angry', es: 'Enojado', ex: "Don't be angry with me." },
+        { en: 'Confused', es: 'Confundido', ex: "I'm confused by the instructions." },
+        { en: 'Proud', es: 'Orgulloso', ex: "I'm proud of my team." },
+        { en: 'Nervous', es: 'Nervioso', ex: 'He was nervous before the show.' },
+        { en: 'Bored', es: 'Aburrido', ex: 'The movie was boring.' },
+        { en: 'Grateful', es: 'Agradecido', ex: "I'm grateful for your help." }
+      ]},
+      technology: { label: 'Tecnología', items: [
+        { en: 'Computer', es: 'Computadora', ex: 'My computer is slow.' },
+        { en: 'Screen', es: 'Pantalla', ex: 'The screen is cracked.' },
+        { en: 'Password', es: 'Contraseña', ex: 'Change your password often.' },
+        { en: 'Software', es: 'Software', ex: 'This software is expensive.' },
+        { en: 'Update', es: 'Actualización', ex: 'The update takes ten minutes.' },
+        { en: 'Device', es: 'Dispositivo', ex: 'Connect the device to the network.' },
+        { en: 'Wireless', es: 'Inalámbrico', ex: 'The wireless keyboard works well.' },
+        { en: 'Charger', es: 'Cargador', ex: 'I forgot my charger at home.' },
+        { en: 'Server', es: 'Servidor', ex: 'The server is down.' },
+        { en: 'Backup', es: 'Copia de seguridad', ex: 'Always make a backup.' }
+      ]},
+      health: { label: 'Salud', items: [
+        { en: 'Doctor', es: 'Doctor', ex: 'I have a doctor appointment.' },
+        { en: 'Medicine', es: 'Medicina', ex: 'Take this medicine after meals.' },
+        { en: 'Headache', es: 'Dolor de cabeza', ex: 'I have a terrible headache.' },
+        { en: 'Healthy', es: 'Saludable', ex: 'Vegetables are healthy.' },
+        { en: 'Injury', es: 'Lesión', ex: "It's a minor injury." },
+        { en: 'Hospital', es: 'Hospital', ex: 'She works at the hospital.' },
+        { en: 'Pain', es: 'Dolor', ex: 'The pain is getting worse.' },
+        { en: 'Recovery', es: 'Recuperación', ex: 'His recovery was quick.' },
+        { en: 'Symptom', es: 'Síntoma', ex: 'Fever is a common symptom.' },
+        { en: 'Treatment', es: 'Tratamiento', ex: 'The treatment lasts six weeks.' }
+      ]},
+      phrasal: { label: 'Verbos frasales', items: [
+        { en: 'Give up', es: 'Rendirse', ex: "Don't give up on your dreams." },
+        { en: 'Look after', es: 'Cuidar', ex: 'Can you look after the kids?' },
+        { en: 'Turn on', es: 'Encender', ex: 'Turn on the lights, please.' },
+        { en: 'Find out', es: 'Descubrir', ex: 'I want to find out the truth.' },
+        { en: 'Get up', es: 'Levantarse', ex: 'I get up at 6 AM.' },
+        { en: 'Run out', es: 'Agotarse', ex: 'We ran out of coffee.' },
+        { en: 'Look for', es: 'Buscar', ex: "I'm looking for my keys." },
+        { en: 'Break down', es: 'Averiarse', ex: 'My car broke down.' },
+        { en: 'Take off', es: 'Despegar', ex: 'The plane takes off soon.' },
+        { en: 'Bring up', es: 'Mencionar / criar', ex: "Don't bring up that topic." }
+      ]},
+      weather: { label: 'Clima', items: [
+        { en: 'Rain', es: 'Lluvia', ex: 'The rain is heavy today.' },
+        { en: 'Snow', es: 'Nieve', ex: 'The snow covered the roads.' },
+        { en: 'Storm', es: 'Tormenta', ex: 'A storm is coming.' },
+        { en: 'Cloudy', es: 'Nublado', ex: "It's cloudy this morning." },
+        { en: 'Sunny', es: 'Soleado', ex: 'It was a sunny afternoon.' },
+        { en: 'Windy', es: 'Ventoso', ex: 'Be careful, it is windy.' },
+        { en: 'Foggy', es: 'Con niebla', ex: 'The road was foggy.' },
+        { en: 'Thunder', es: 'Trueno', ex: 'The thunder scared the dog.' },
+        { en: 'Lightning', es: 'Relámpago', ex: 'Lightning lit up the sky.' },
+        { en: 'Forecast', es: 'Pronóstico', ex: 'The forecast predicts rain.' }
+      ]},
+      city: { label: 'Ciudad', items: [
+        { en: 'Neighborhood', es: 'Vecindario', ex: 'I live in a quiet neighborhood.' },
+        { en: 'Sidewalk', es: 'Acera', ex: 'Walk on the sidewalk.' },
+        { en: 'Traffic', es: 'Tráfico', ex: 'The traffic is terrible today.' },
+        { en: 'Highway', es: 'Autopista', ex: 'Take the highway to arrive faster.' },
+        { en: 'Building', es: 'Edificio', ex: 'That building is very tall.' },
+        { en: 'Bridge', es: 'Puente', ex: 'Cross the bridge and turn left.' },
+        { en: 'Downtown', es: 'Centro', ex: 'We had dinner downtown.' },
+        { en: 'Suburb', es: 'Suburbio', ex: 'They moved to the suburbs.' },
+        { en: 'Crosswalk', es: 'Paso peatonal', ex: 'Use the crosswalk to be safe.' },
+        { en: 'Landmark', es: 'Punto de referencia', ex: 'The tower is a famous landmark.' }
+      ]}
+    }
+  },
+  hard: {
+    label: 'Avanzado', tag: 'C1 · C2',
+    categories: {
+      business: { label: 'Negocios', items: [
+        { en: 'Revenue', es: 'Ingresos', ex: 'Revenue increased last quarter.' },
+        { en: 'Stakeholder', es: 'Interesado', ex: 'All stakeholders were consulted.' },
+        { en: 'Merger', es: 'Fusión', ex: 'The merger created a giant firm.' },
+        { en: 'Leverage', es: 'Apalancar', ex: 'We leverage new technology.' },
+        { en: 'Compliance', es: 'Cumplimiento', ex: 'Compliance is mandatory.' },
+        { en: 'Procurement', es: 'Adquisiciones', ex: 'The procurement team handles vendors.' },
+        { en: 'Overhead', es: 'Gastos generales', ex: 'Overhead costs are rising.' },
+        { en: 'Downsize', es: 'Reducir personal', ex: 'The company had to downsize.' },
+        { en: 'Outsource', es: 'Subcontratar', ex: 'They outsource development abroad.' },
+        { en: 'Turnover', es: 'Rotación', ex: 'Employee turnover is high.' }
+      ]},
+      idioms: { label: 'Modismos', items: [
+        { en: 'Break the ice', es: 'Romper el hielo', ex: "Let's break the ice with a joke." },
+        { en: 'Piece of cake', es: 'Pan comido', ex: 'The test was a piece of cake.' },
+        { en: 'Cost an arm and a leg', es: 'Costar un ojo de la cara', ex: 'That car cost an arm and a leg.' },
+        { en: 'Under the weather', es: 'Indispuesto', ex: "I'm feeling under the weather today." },
+        { en: 'Hit the books', es: 'Estudiar duro', ex: 'I need to hit the books tonight.' },
+        { en: 'Once in a blue moon', es: 'Muy rara vez', ex: 'He visits once in a blue moon.' },
+        { en: 'Spill the beans', es: 'Contar el secreto', ex: "Don't spill the beans about the party." },
+        { en: 'Bite the bullet', es: 'Aguantar el trago', ex: 'You have to bite the bullet and do it.' },
+        { en: 'Cut corners', es: 'Escatimar esfuerzos', ex: 'Never cut corners on safety.' },
+        { en: 'Hit the sack', es: 'Irse a dormir', ex: "I'm exhausted, time to hit the sack." }
+      ]},
+      academic: { label: 'Académico', items: [
+        { en: 'Hypothesis', es: 'Hipótesis', ex: 'The hypothesis was proven wrong.' },
+        { en: 'Empirical', es: 'Empírico', ex: 'We need empirical evidence.' },
+        { en: 'Paradigm', es: 'Paradigma', ex: 'This is a paradigm shift.' },
+        { en: 'Methodology', es: 'Metodología', ex: 'Explain your methodology clearly.' },
+        { en: 'Discourse', es: 'Discurso', ex: 'The discourse changed dramatically.' },
+        { en: 'Framework', es: 'Marco', ex: 'We built a solid framework.' },
+        { en: 'Consensus', es: 'Consenso', ex: 'We reached a consensus quickly.' },
+        { en: 'Synthesis', es: 'Síntesis', ex: 'Write a synthesis of the papers.' },
+        { en: 'Rigorous', es: 'Riguroso', ex: 'This is rigorous research.' },
+        { en: 'Cognition', es: 'Cognición', ex: 'Sleep affects cognition.' }
+      ]},
+      abstract: { label: 'Abstracto', items: [
+        { en: 'Ambiguity', es: 'Ambigüedad', ex: "There's too much ambiguity in the rules." },
+        { en: 'Resilience', es: 'Resiliencia', ex: 'She showed remarkable resilience.' },
+        { en: 'Nuance', es: 'Matiz', ex: 'Every word has its nuance.' },
+        { en: 'Integrity', es: 'Integridad', ex: 'He is known for his integrity.' },
+        { en: 'Perseverance', es: 'Perseverancia', ex: 'Success requires perseverance.' },
+        { en: 'Serendipity', es: 'Serendipia', ex: 'We met by pure serendipity.' },
+        { en: 'Solitude', es: 'Soledad', ex: 'He enjoys solitude in nature.' },
+        { en: 'Melancholy', es: 'Melancolía', ex: 'Autumn brings melancholy.' },
+        { en: 'Skepticism', es: 'Escepticismo', ex: 'Approach the news with skepticism.' },
+        { en: 'Enlightenment', es: 'Iluminación', ex: 'The book led to my enlightenment.' }
+      ]},
+      adjectives: { label: 'Adjetivos', items: [
+        { en: 'Meticulous', es: 'Meticuloso', ex: 'She is meticulous with details.' },
+        { en: 'Pragmatic', es: 'Pragmático', ex: "Let's take a pragmatic approach." },
+        { en: 'Ubiquitous', es: 'Ubicuo', ex: 'Smartphones are ubiquitous.' },
+        { en: 'Eloquent', es: 'Elocuente', ex: 'He gave an eloquent speech.' },
+        { en: 'Redundant', es: 'Redundante', ex: 'This sentence is redundant.' },
+        { en: 'Feasible', es: 'Factible', ex: 'The plan is not feasible.' },
+        { en: 'Arbitrary', es: 'Arbitrario', ex: 'That decision seems arbitrary.' },
+        { en: 'Coherent', es: 'Coherente', ex: 'Write a coherent essay.' },
+        { en: 'Superfluous', es: 'Superfluo', ex: 'Remove superfluous details.' },
+        { en: 'Compelling', es: 'Convincente', ex: 'It was a compelling argument.' }
+      ]},
+      verbs: { label: 'Verbos', items: [
+        { en: 'Elaborate', es: 'Elaborar / detallar', ex: 'Can you elaborate on that point?' },
+        { en: 'Undermine', es: 'Socavar', ex: "Don't undermine your own work." },
+        { en: 'Fluctuate', es: 'Fluctuar', ex: 'Prices fluctuate every week.' },
+        { en: 'Contemplate', es: 'Contemplar', ex: "I'm contemplating a career change." },
+        { en: 'Endorse', es: 'Respaldar', ex: 'I fully endorse this candidate.' },
+        { en: 'Mitigate', es: 'Mitigar', ex: 'We must mitigate the risks.' },
+        { en: 'Advocate', es: 'Abogar por', ex: 'She advocates for equal rights.' },
+        { en: 'Perceive', es: 'Percibir', ex: 'How do you perceive this issue?' },
+        { en: 'Reconcile', es: 'Reconciliar', ex: "It's hard to reconcile the two ideas." },
+        { en: 'Persist', es: 'Persistir', ex: 'The problem persists despite our efforts.' }
+      ]},
+      literary: { label: 'Literario', items: [
+        { en: 'Poignant', es: 'Conmovedor', ex: 'It was a poignant farewell.' },
+        { en: 'Ephemeral', es: 'Efímero', ex: 'Fame is often ephemeral.' },
+        { en: 'Quintessential', es: 'Por excelencia', ex: 'He is the quintessential gentleman.' },
+        { en: 'Juxtapose', es: 'Yuxtaponer', ex: 'The author juxtaposes old and new.' },
+        { en: 'Allegory', es: 'Alegoría', ex: 'The novel is an allegory of power.' },
+        { en: 'Foreshadow', es: 'Presagiar', ex: 'The dream foreshadowed the tragedy.' },
+        { en: 'Metaphor', es: 'Metáfora', ex: 'Life is a metaphor for a journey.' },
+        { en: 'Irony', es: 'Ironía', ex: 'The irony was not lost on him.' },
+        { en: 'Solemn', es: 'Solemne', ex: 'The ceremony was solemn and quiet.' },
+        { en: 'Vivid', es: 'Vívido', ex: 'She has vivid childhood memories.' }
+      ]},
+      politics: { label: 'Política y sociedad', items: [
+        { en: 'Accountability', es: 'Rendición de cuentas', ex: 'The public demands accountability.' },
+        { en: 'Bipartisan', es: 'Bipartidista', ex: 'The bill had bipartisan support.' },
+        { en: 'Sovereignty', es: 'Soberanía', ex: 'National sovereignty is essential.' },
+        { en: 'Constituency', es: 'Distrito electoral', ex: 'She visited her constituency.' },
+        { en: 'Legislation', es: 'Legislación', ex: 'New legislation was passed.' },
+        { en: 'Advocacy', es: 'Defensa / abogacía', ex: 'Advocacy groups organized a march.' },
+        { en: 'Grassroots', es: 'De base', ex: "It's a grassroots movement." },
+        { en: 'Disenfranchise', es: 'Privar de derechos', ex: 'The law disenfranchised many voters.' },
+        { en: 'Polarization', es: 'Polarización', ex: 'Polarization has grown in recent years.' },
+        { en: 'Rhetoric', es: 'Retórica', ex: 'His rhetoric divided the room.' }
+      ]}
+    }
+  }
+};
+
+// ============================================================
+//  PHRASES DATA
+// ============================================================
+const PHRASES_DATA = {
+  basic: {
+    label: 'Básico', tag: 'A1 · A2',
+    categories: {
+      introducing: { label: 'Presentarse', items: [
+        { en: "What's your name?", es: '¿Cuál es tu nombre?', ctx: 'Al conocer a alguien nuevo.' },
+        { en: 'My name is Erick', es: 'Me llamo Erick', ctx: 'Respondiendo a la pregunta.' },
+        { en: 'Nice to meet you', es: 'Mucho gusto', ctx: 'Al ser presentado a alguien.' },
+        { en: 'Where are you from?', es: '¿De dónde eres?', ctx: 'Preguntando por el país u origen.' },
+        { en: "I'm from Peru", es: 'Soy de Perú', ctx: 'Diciendo tu nacionalidad.' },
+        { en: 'How old are you?', es: '¿Cuántos años tienes?', ctx: 'Solo con personas de confianza.' },
+        { en: "I'm 25 years old", es: 'Tengo 25 años', ctx: 'Respondiendo tu edad.' },
+        { en: 'What do you do?', es: '¿A qué te dedicas?', ctx: 'Preguntando por profesión.' },
+        { en: "I'm a developer", es: 'Soy desarrollador', ctx: 'Diciendo tu profesión.' },
+        { en: 'Nice to meet you too', es: 'Igualmente, un gusto', ctx: 'Devolviendo el saludo.' }
+      ]},
+      restaurant: { label: 'Restaurante', items: [
+        { en: 'A table for two, please', es: 'Una mesa para dos, por favor', ctx: 'Al llegar al restaurante.' },
+        { en: 'Can I see the menu?', es: '¿Puedo ver el menú?', ctx: 'Al sentarte.' },
+        { en: "I'll have the chicken", es: 'Yo quiero el pollo', ctx: 'Al ordenar tu plato.' },
+        { en: 'What do you recommend?', es: '¿Qué recomienda?', ctx: 'Cuando no sabes qué pedir.' },
+        { en: 'Is this spicy?', es: '¿Esto es picante?', ctx: 'Preguntando por un plato.' },
+        { en: 'Can I get some water?', es: '¿Me trae agua?', ctx: 'Pidiendo bebida al mesero.' },
+        { en: 'The check, please', es: 'La cuenta, por favor', ctx: 'Al terminar la comida.' },
+        { en: 'Do you take cards?', es: '¿Aceptan tarjeta?', ctx: 'Al momento de pagar.' },
+        { en: 'It was delicious', es: 'Estuvo delicioso', ctx: 'Halago al chef o mesero.' },
+        { en: "I'm allergic to nuts", es: 'Soy alérgico a las nueces', ctx: 'Advertencia importante al ordenar.' }
+      ]},
+      directions: { label: 'Direcciones', items: [
+        { en: 'Excuse me, where is the bathroom?', es: 'Disculpa, ¿dónde está el baño?', ctx: 'En un lugar público.' },
+        { en: 'How do I get to the airport?', es: '¿Cómo llego al aeropuerto?', ctx: 'Preguntando por un lugar lejano.' },
+        { en: 'Is it far from here?', es: '¿Está lejos de aquí?', ctx: 'Para saber la distancia.' },
+        { en: 'Turn left at the corner', es: 'Dobla a la izquierda en la esquina', ctx: 'Dando direcciones a alguien.' },
+        { en: 'Go straight ahead', es: 'Sigue derecho', ctx: 'Indicación básica.' },
+        { en: "It's two blocks away", es: 'Está a dos cuadras', ctx: 'Indicando distancia corta.' },
+        { en: 'Can you show me on the map?', es: '¿Me lo puedes mostrar en el mapa?', ctx: 'Cuando no entiendes bien.' },
+        { en: "I'm lost", es: 'Estoy perdido', ctx: 'Cuando necesitas ayuda urgente.' },
+        { en: 'Which bus goes downtown?', es: '¿Cuál bus va al centro?', ctx: 'En un paradero.' },
+        { en: 'How long does it take?', es: '¿Cuánto tiempo demora?', ctx: 'Preguntando duración del viaje.' }
+      ]},
+      shopping: { label: 'Compras', items: [
+        { en: 'How much is this?', es: '¿Cuánto cuesta esto?', ctx: 'Preguntando el precio.' },
+        { en: 'Do you have this in blue?', es: '¿Lo tienen en azul?', ctx: 'Preguntando por otro color.' },
+        { en: 'Can I try it on?', es: '¿Me lo puedo probar?', ctx: 'Con ropa o calzado.' },
+        { en: "It's too expensive", es: 'Es muy caro', ctx: 'Comentando el precio.' },
+        { en: "I'll take it", es: 'Me lo llevo', ctx: 'Al decidir comprar algo.' },
+        { en: 'Do you have a smaller size?', es: '¿Tienen una talla más pequeña?', ctx: 'Preguntando por talla.' },
+        { en: "I'm just looking", es: 'Solo estoy mirando', ctx: 'Cuando el vendedor te aborda.' },
+        { en: 'Is there a discount?', es: '¿Hay descuento?', ctx: 'Preguntando por promociones.' },
+        { en: "Where's the fitting room?", es: '¿Dónde está el probador?', ctx: 'Buscando dónde probarte ropa.' },
+        { en: 'Can I get a receipt?', es: '¿Me da el recibo?', ctx: 'Después de pagar.' }
+      ]},
+      daily: { label: 'Preguntas diarias', items: [
+        { en: 'How are you?', es: '¿Cómo estás?', ctx: 'Saludo casual del día a día.' },
+        { en: 'What time is it?', es: '¿Qué hora es?', ctx: 'Preguntando la hora.' },
+        { en: 'What day is today?', es: '¿Qué día es hoy?', ctx: 'Cuando pierdes la noción del tiempo.' },
+        { en: 'Can you help me?', es: '¿Me puedes ayudar?', ctx: 'Pidiendo asistencia.' },
+        { en: 'What does this mean?', es: '¿Qué significa esto?', ctx: 'Al aprender vocabulario.' },
+        { en: 'Can you repeat that?', es: '¿Puedes repetir eso?', ctx: 'Cuando no escuchaste bien.' },
+        { en: 'Speak slower, please', es: 'Habla más despacio, por favor', ctx: 'Cuando hablan muy rápido.' },
+        { en: "I don't understand", es: 'No entiendo', ctx: 'Expresando confusión.' },
+        { en: 'Do you speak Spanish?', es: '¿Hablas español?', ctx: 'Buscando un idioma común.' },
+        { en: 'How do you say ___ in English?', es: '¿Cómo se dice ___ en inglés?', ctx: 'Aprendiendo palabras nuevas.' }
+      ]}
+    }
+  },
+  medium: {
+    label: 'Intermedio', tag: 'B1 · B2',
+    categories: {
+      office: { label: 'Oficina', items: [
+        { en: 'Can we schedule a meeting?', es: '¿Podemos agendar una reunión?', ctx: 'Coordinando con un colega.' },
+        { en: "I'll get back to you", es: 'Te respondo luego', ctx: 'Cuando no puedes contestar ahora.' },
+        { en: 'Let me check on that', es: 'Déjame revisar eso', ctx: 'Antes de dar una respuesta.' },
+        { en: "I'm running late", es: 'Voy a llegar tarde', ctx: 'Avisando por chat o mensaje.' },
+        { en: 'Could you send me the file?', es: '¿Me puedes enviar el archivo?', ctx: 'Pidiendo un documento.' },
+        { en: 'I need more time', es: 'Necesito más tiempo', ctx: 'Cuando un deadline es apretado.' },
+        { en: "Let's touch base tomorrow", es: 'Hablemos mañana', ctx: 'Cerrando una conversación.' },
+        { en: 'That works for me', es: 'Me funciona', ctx: 'Aceptando un plan o hora.' },
+        { en: "I'm on it", es: 'Ya me encargo', ctx: 'Aceptando una tarea.' },
+        { en: 'Can you clarify?', es: '¿Puedes aclarar?', ctx: 'Pidiendo más detalles.' }
+      ]},
+      traveling: { label: 'Viajando', items: [
+        { en: 'Where can I check in?', es: '¿Dónde puedo hacer check-in?', ctx: 'Al llegar al aeropuerto.' },
+        { en: 'Is the flight delayed?', es: '¿Está retrasado el vuelo?', ctx: 'Verificando estado del vuelo.' },
+        { en: 'I have a reservation', es: 'Tengo una reserva', ctx: 'Al llegar al hotel.' },
+        { en: 'What time is checkout?', es: '¿A qué hora es el checkout?', ctx: 'Al llegar al hotel.' },
+        { en: 'Can I get a wake-up call?', es: '¿Me pueden despertar por teléfono?', ctx: 'Servicio típico de hotel.' },
+        { en: "Where's the nearest ATM?", es: '¿Dónde está el cajero más cercano?', ctx: 'Buscando dinero en efectivo.' },
+        { en: "I'd like to exchange money", es: 'Quiero cambiar dinero', ctx: 'En casa de cambio.' },
+        { en: 'Can you call me a taxi?', es: '¿Me puedes llamar un taxi?', ctx: 'En un hotel o restaurante.' },
+        { en: 'How much is the fare?', es: '¿Cuánto es la tarifa?', ctx: 'En taxi o transporte.' },
+        { en: 'I missed my flight', es: 'Perdí mi vuelo', ctx: 'Emergencia en el aeropuerto.' }
+      ]},
+      phone: { label: 'Al teléfono', items: [
+        { en: 'May I speak to John?', es: '¿Puedo hablar con John?', ctx: 'Al iniciar una llamada.' },
+        { en: "Who's calling, please?", es: '¿Quién habla, por favor?', ctx: 'Al contestar una llamada.' },
+        { en: 'Hold on a moment', es: 'Espere un momento', ctx: 'Poniendo a alguien en espera.' },
+        { en: "He's not available right now", es: 'No está disponible ahora', ctx: 'Cuando la persona no está.' },
+        { en: 'Can I take a message?', es: '¿Le puedo tomar un mensaje?', ctx: 'Ofreciendo pasar un recado.' },
+        { en: 'Could you speak up?', es: '¿Podría hablar más alto?', ctx: 'Cuando no escuchas bien.' },
+        { en: "You're breaking up", es: 'Te escucho entrecortado', ctx: 'Cuando hay mala señal.' },
+        { en: "I'll call you back", es: 'Te llamo de vuelta', ctx: 'Devolviendo la llamada.' },
+        { en: 'Is this a good time?', es: '¿Es buen momento?', ctx: 'Al inicio de una llamada.' },
+        { en: 'Thanks for calling', es: 'Gracias por llamar', ctx: 'Cerrando la conversación.' }
+      ]},
+      opinion: { label: 'Opinar', items: [
+        { en: 'In my opinion...', es: 'En mi opinión...', ctx: 'Introduciendo tu punto de vista.' },
+        { en: 'I think that...', es: 'Pienso que...', ctx: 'Expresando una idea.' },
+        { en: "I don't quite agree", es: 'No estoy muy de acuerdo', ctx: 'Desacuerdo educado.' },
+        { en: "That's a good point", es: 'Ese es un buen punto', ctx: 'Reconociendo un argumento.' },
+        { en: 'I see what you mean', es: 'Entiendo lo que quieres decir', ctx: 'Mostrando comprensión.' },
+        { en: 'On the other hand...', es: 'Por otro lado...', ctx: 'Introduciendo un contrapunto.' },
+        { en: 'It depends on...', es: 'Depende de...', ctx: 'Respuesta con condiciones.' },
+        { en: "I couldn't agree more", es: 'No podría estar más de acuerdo', ctx: 'Acuerdo fuerte.' },
+        { en: "I'd rather...", es: 'Preferiría...', ctx: 'Expresando una preferencia.' },
+        { en: 'Have you considered...?', es: '¿Has considerado...?', ctx: 'Sugiriendo una alternativa.' }
+      ]},
+      smalltalk: { label: 'Small talk', items: [
+        { en: "How's it going?", es: '¿Cómo va todo?', ctx: 'Saludo informal.' },
+        { en: 'Long time no see!', es: '¡Cuánto tiempo sin verte!', ctx: 'Al reencontrarte con alguien.' },
+        { en: 'What have you been up to?', es: '¿Qué has estado haciendo?', ctx: 'Poniéndote al día.' },
+        { en: 'Any plans for the weekend?', es: '¿Tienes planes para el fin de semana?', ctx: 'Conversación casual.' },
+        { en: 'The weather is nice today', es: 'El clima está lindo hoy', ctx: 'Tema seguro para conversar.' },
+        { en: 'Same here', es: 'Igual aquí', ctx: 'Cuando compartes lo mismo.' },
+        { en: 'Sounds fun!', es: '¡Suena divertido!', ctx: 'Reaccionando positivo a un plan.' },
+        { en: "That's too bad", es: 'Qué pena', ctx: 'Mostrando empatía.' },
+        { en: 'Take care!', es: '¡Cuídate!', ctx: 'Despedida cálida.' },
+        { en: 'Talk to you later', es: 'Hablamos luego', ctx: 'Despedida casual.' }
+      ]}
+    }
+  },
+  hard: {
+    label: 'Avanzado', tag: 'C1 · C2',
+    categories: {
+      meetings: { label: 'Reuniones', items: [
+        { en: "Let's circle back to that", es: 'Volvamos a eso después', ctx: 'Aplazando un tema en reunión.' },
+        { en: 'Could you elaborate on that?', es: '¿Podrías ampliar sobre eso?', ctx: 'Pidiendo más detalles.' },
+        { en: "I'd like to raise a concern", es: 'Quisiera plantear una preocupación', ctx: 'Introduciendo un problema.' },
+        { en: "Let's park that for now", es: 'Dejemos eso pendiente por ahora', ctx: 'Posponiendo una discusión.' },
+        { en: 'That falls outside our scope', es: 'Eso está fuera de nuestro alcance', ctx: 'Delimitando responsabilidades.' },
+        { en: 'We need to align on this', es: 'Necesitamos alinearnos en esto', ctx: 'Buscando consenso.' },
+        { en: "Let's take this offline", es: 'Discutamos esto en privado', ctx: 'Moviendo tema fuera de reunión.' },
+        { en: "I'd like to push back on that", es: 'Me gustaría objetar eso', ctx: 'Desacuerdo profesional.' },
+        { en: "Let me play devil's advocate", es: 'Déjame ser el abogado del diablo', ctx: 'Ofreciendo contrapunto.' },
+        { en: 'What are the next steps?', es: '¿Cuáles son los siguientes pasos?', ctx: 'Cierre de reunión.' }
+      ]},
+      arguing: { label: 'Argumentar', items: [
+        { en: "That's a fair point, but...", es: 'Es un buen punto, pero...', ctx: 'Reconociendo antes de refutar.' },
+        { en: 'I beg to differ', es: 'Difiero respetuosamente', ctx: 'Desacuerdo formal.' },
+        { en: 'The evidence suggests...', es: 'La evidencia sugiere...', ctx: 'Basando tu argumento en datos.' },
+        { en: "It's worth noting that...", es: 'Vale la pena señalar que...', ctx: 'Añadiendo información importante.' },
+        { en: "Let's not lose sight of...", es: 'No perdamos de vista...', ctx: 'Refocalizando la discusión.' },
+        { en: "That's beside the point", es: 'Eso no viene al caso', ctx: 'Descartando una distracción.' },
+        { en: "You're missing the point", es: 'Estás perdiendo el punto', ctx: 'Corrigiendo un malentendido.' },
+        { en: "To play devil's advocate...", es: 'Para poner esto en duda...', ctx: 'Cuestionando una idea.' },
+        { en: "Correct me if I'm wrong", es: 'Corrígeme si me equivoco', ctx: 'Verificando información.' },
+        { en: 'I stand by my position', es: 'Mantengo mi posición', ctx: 'Firmeza ante la presión.' }
+      ]},
+      negotiating: { label: 'Negociar', items: [
+        { en: "Let's find a middle ground", es: 'Encontremos un punto medio', ctx: 'Buscando un compromiso.' },
+        { en: "That's non-negotiable", es: 'Eso no es negociable', ctx: 'Marcando un límite firme.' },
+        { en: "I'm afraid I can't accept that", es: 'Me temo que no puedo aceptar eso', ctx: 'Rechazo educado y firme.' },
+        { en: "What's your best offer?", es: '¿Cuál es su mejor oferta?', ctx: 'Presionando por mejor precio.' },
+        { en: "Let's meet halfway", es: 'Encontrémonos a mitad de camino', ctx: 'Proponiendo equilibrio.' },
+        { en: 'We have some flexibility on that', es: 'Tenemos algo de flexibilidad ahí', ctx: 'Abriendo espacio a negociar.' },
+        { en: "That's a dealbreaker for us", es: 'Eso rompe el trato para nosotros', ctx: 'Punto crítico e innegociable.' },
+        { en: 'Can we revisit this?', es: '¿Podemos volver a revisar esto?', ctx: 'Reabriendo una discusión.' },
+        { en: "I'll need to run this by my team", es: 'Necesito consultarlo con mi equipo', ctx: 'Ganando tiempo antes de decidir.' },
+        { en: 'That works for both parties', es: 'Eso funciona para ambas partes', ctx: 'Cerrando un acuerdo.' }
+      ]},
+      interview: { label: 'Entrevistas', items: [
+        { en: 'Tell me about yourself', es: 'Cuéntame sobre ti', ctx: 'Pregunta de apertura clásica.' },
+        { en: 'What are your strengths?', es: '¿Cuáles son tus fortalezas?', ctx: 'Autoevaluación positiva.' },
+        { en: "What's your greatest weakness?", es: '¿Cuál es tu mayor debilidad?', ctx: 'Pregunta difícil frecuente.' },
+        { en: 'Where do you see yourself in five years?', es: '¿Dónde te ves en cinco años?', ctx: 'Sobre tu proyección profesional.' },
+        { en: 'Why should we hire you?', es: '¿Por qué deberíamos contratarte?', ctx: 'Momento de autopromoción.' },
+        { en: 'Can you describe a challenge you overcame?', es: 'Describe un reto que superaste', ctx: 'Pregunta de comportamiento.' },
+        { en: 'What are your salary expectations?', es: '¿Cuáles son tus expectativas salariales?', ctx: 'Negociación de compensación.' },
+        { en: 'Do you have any questions for us?', es: '¿Tienes preguntas para nosotros?', ctx: 'Cierre de la entrevista.' },
+        { en: "I'm passionate about...", es: 'Me apasiona...', ctx: 'Mostrando entusiasmo genuino.' },
+        { en: 'I thrive in fast-paced environments', es: 'Me destaco en ambientes dinámicos', ctx: 'Autodescripción profesional.' }
+      ]},
+      formal: { label: 'Formales', items: [
+        { en: 'I would appreciate it if...', es: 'Le agradecería si...', ctx: 'Pedido muy formal.' },
+        { en: 'Please accept my apologies', es: 'Por favor acepte mis disculpas', ctx: 'Disculpa formal.' },
+        { en: 'To whom it may concern', es: 'A quien corresponda', ctx: 'En cartas o correos formales.' },
+        { en: 'I regret to inform you...', es: 'Lamento informarle...', ctx: 'Comunicando malas noticias.' },
+        { en: 'It has come to my attention that...', es: 'Ha llegado a mi atención que...', ctx: 'Introduciendo un tema serio.' },
+        { en: 'I look forward to hearing from you', es: 'Espero saber de usted pronto', ctx: 'Cierre de correo formal.' },
+        { en: 'With all due respect...', es: 'Con todo respeto...', ctx: 'Antes de un desacuerdo firme.' },
+        { en: 'I trust this finds you well', es: 'Espero que se encuentre bien', ctx: 'Apertura de correo formal.' },
+        { en: 'On behalf of the team...', es: 'En nombre del equipo...', ctx: 'Hablando por un grupo.' },
+        { en: 'Kindly find attached...', es: 'Por favor encuentre adjunto...', ctx: 'Enviando documentos por correo.' }
+      ]}
+    }
+  }
+};
+
+// ============================================================
+//  DIALOGUES DATA
+// ============================================================
+const DIALOGUES_DATA = {
+  basic: {
+    label: 'Básico', tag: 'A1 · A2',
+    categories: {
+      cafe: {
+        label: 'Café',
+        title: 'En el café',
+        desc: 'Ordenando una bebida en una cafetería local.',
+        turns: [
+          { speaker: 'Barista', en: 'Good morning! What can I get you?', es: '¡Buenos días! ¿Qué le puedo servir?' },
+          { speaker: 'Cliente', en: 'Hi, can I have a coffee, please?', es: 'Hola, ¿me puede dar un café, por favor?' },
+          { speaker: 'Barista', en: 'Sure. Small, medium, or large?', es: 'Claro. ¿Pequeño, mediano o grande?' },
+          { speaker: 'Cliente', en: 'Medium, please.', es: 'Mediano, por favor.' },
+          { speaker: 'Barista', en: 'With milk?', es: '¿Con leche?' },
+          { speaker: 'Cliente', en: 'Yes, with milk and one sugar.', es: 'Sí, con leche y una azúcar.' },
+          { speaker: 'Barista', en: "That's four dollars.", es: 'Son cuatro dólares.' },
+          { speaker: 'Cliente', en: 'Here you are. Thank you.', es: 'Aquí tiene. Gracias.' },
+          { speaker: 'Barista', en: 'Have a nice day!', es: '¡Que tenga un buen día!' },
+          { speaker: 'Cliente', en: 'You too.', es: 'Igualmente.' }
+        ]
+      },
+      meeting: {
+        label: 'Presentarse',
+        title: 'Primer día de clase',
+        desc: 'Dos estudiantes se conocen en su primera clase de inglés.',
+        turns: [
+          { speaker: 'Ana', en: "Hi! I'm Ana.", es: '¡Hola! Soy Ana.' },
+          { speaker: 'David', en: "Hello Ana, I'm David. Nice to meet you.", es: 'Hola Ana, soy David. Mucho gusto.' },
+          { speaker: 'Ana', en: 'Nice to meet you too. Where are you from?', es: 'Mucho gusto también. ¿De dónde eres?' },
+          { speaker: 'David', en: "I'm from Spain. And you?", es: 'Soy de España. ¿Y tú?' },
+          { speaker: 'Ana', en: "I'm from Peru.", es: 'Soy de Perú.' },
+          { speaker: 'David', en: 'How long have you been here?', es: '¿Cuánto tiempo llevas aquí?' },
+          { speaker: 'Ana', en: "Two months. It's my first English class.", es: 'Dos meses. Es mi primera clase de inglés.' },
+          { speaker: 'David', en: 'Same for me. Are you nervous?', es: 'Yo también. ¿Estás nervioso?' },
+          { speaker: 'Ana', en: 'A little. But it looks fun.', es: 'Un poco. Pero se ve divertido.' },
+          { speaker: 'David', en: "Yes, I think we'll learn a lot.", es: 'Sí, creo que aprenderemos mucho.' }
+        ]
+      },
+      store: {
+        label: 'Tienda',
+        title: 'Comprando ropa',
+        desc: 'Un cliente busca una camisa en una tienda.',
+        turns: [
+          { speaker: 'Vendedora', en: 'Hello, can I help you?', es: 'Hola, ¿le puedo ayudar?' },
+          { speaker: 'Cliente', en: "Yes, I'm looking for a blue shirt.", es: 'Sí, estoy buscando una camisa azul.' },
+          { speaker: 'Vendedora', en: 'What size do you need?', es: '¿Qué talla necesita?' },
+          { speaker: 'Cliente', en: 'Medium, I think.', es: 'Mediana, creo.' },
+          { speaker: 'Vendedora', en: "Here's one. Do you want to try it on?", es: 'Aquí tiene una. ¿Quiere probársela?' },
+          { speaker: 'Cliente', en: "Yes, please. Where's the fitting room?", es: 'Sí, por favor. ¿Dónde está el probador?' },
+          { speaker: 'Vendedora', en: 'Right over there.', es: 'Justo allí.' },
+          { speaker: 'Cliente', en: 'It fits well. How much is it?', es: 'Me queda bien. ¿Cuánto cuesta?' },
+          { speaker: 'Vendedora', en: 'Twenty-five dollars.', es: 'Veinticinco dólares.' },
+          { speaker: 'Cliente', en: "Great, I'll take it.", es: 'Genial, me la llevo.' }
+        ]
+      },
+      hotel: {
+        label: 'Hotel',
+        title: 'Check-in en el hotel',
+        desc: 'Un huésped hace su registro al llegar al hotel.',
+        turns: [
+          { speaker: 'Recepcionista', en: 'Good afternoon. Welcome to the hotel.', es: 'Buenas tardes. Bienvenido al hotel.' },
+          { speaker: 'Huésped', en: 'Hi, I have a reservation.', es: 'Hola, tengo una reserva.' },
+          { speaker: 'Recepcionista', en: 'Can I have your name, please?', es: '¿Me da su nombre, por favor?' },
+          { speaker: 'Huésped', en: 'Erick Huamani.', es: 'Erick Huamani.' },
+          { speaker: 'Recepcionista', en: 'Yes, I found it. Two nights, right?', es: 'Sí, la encontré. Dos noches, ¿verdad?' },
+          { speaker: 'Huésped', en: "That's correct.", es: 'Correcto.' },
+          { speaker: 'Recepcionista', en: 'Can I see your passport?', es: '¿Puedo ver su pasaporte?' },
+          { speaker: 'Huésped', en: 'Here you go.', es: 'Aquí tiene.' },
+          { speaker: 'Recepcionista', en: "Your room is 302. Here's your key.", es: 'Su habitación es la 302. Aquí está su llave.' },
+          { speaker: 'Huésped', en: 'Thank you. What time is breakfast?', es: 'Gracias. ¿A qué hora es el desayuno?' },
+          { speaker: 'Recepcionista', en: 'From seven to ten.', es: 'De siete a diez.' },
+          { speaker: 'Huésped', en: 'Perfect. Thanks.', es: 'Perfecto. Gracias.' }
+        ]
+      },
+      directions: {
+        label: 'Direcciones',
+        title: 'Preguntando cómo llegar',
+        desc: 'Un turista pide direcciones a un local para llegar al museo.',
+        turns: [
+          { speaker: 'Turista', en: 'Excuse me, can you help me?', es: 'Disculpa, ¿me puedes ayudar?' },
+          { speaker: 'Local', en: 'Sure, what do you need?', es: 'Claro, ¿qué necesitas?' },
+          { speaker: 'Turista', en: 'How do I get to the museum?', es: '¿Cómo llego al museo?' },
+          { speaker: 'Local', en: "It's not far. Go straight for two blocks.", es: 'No está lejos. Sigue derecho dos cuadras.' },
+          { speaker: 'Turista', en: 'Two blocks, okay.', es: 'Dos cuadras, ok.' },
+          { speaker: 'Local', en: 'Then turn right at the traffic light.', es: 'Luego dobla a la derecha en el semáforo.' },
+          { speaker: 'Turista', en: 'And after that?', es: '¿Y después de eso?' },
+          { speaker: 'Local', en: "You'll see it on your left. A big white building.", es: 'Lo verás a tu izquierda. Un edificio grande y blanco.' },
+          { speaker: 'Turista', en: 'How long does it take walking?', es: '¿Cuánto tiempo toma caminando?' },
+          { speaker: 'Local', en: 'About ten minutes.', es: 'Unos diez minutos.' },
+          { speaker: 'Turista', en: 'Thank you so much!', es: '¡Muchas gracias!' },
+          { speaker: 'Local', en: "You're welcome.", es: 'De nada.' }
+        ]
+      },
+      pharmacy: {
+        label: 'Farmacia',
+        title: 'En la farmacia',
+        desc: 'Un cliente compra medicina para un resfriado.',
+        turns: [
+          { speaker: 'Cliente', en: 'Hi, I need something for a cold.', es: 'Hola, necesito algo para un resfriado.' },
+          { speaker: 'Farmacéutico', en: 'What are your symptoms?', es: '¿Cuáles son sus síntomas?' },
+          { speaker: 'Cliente', en: 'A runny nose and a sore throat.', es: 'Nariz con moco y dolor de garganta.' },
+          { speaker: 'Farmacéutico', en: 'Do you have a fever?', es: '¿Tiene fiebre?' },
+          { speaker: 'Cliente', en: 'No, just tired.', es: 'No, solo cansado.' },
+          { speaker: 'Farmacéutico', en: 'This one works well. Take it twice a day.', es: 'Este funciona bien. Tómelo dos veces al día.' },
+          { speaker: 'Cliente', en: 'How much is it?', es: '¿Cuánto cuesta?' },
+          { speaker: 'Farmacéutico', en: 'Eight dollars.', es: 'Ocho dólares.' },
+          { speaker: 'Cliente', en: 'Can I pay with card?', es: '¿Puedo pagar con tarjeta?' },
+          { speaker: 'Farmacéutico', en: 'Of course. Feel better soon.', es: 'Por supuesto. Que se mejore pronto.' }
+        ]
+      },
+      taxi: {
+        label: 'Taxi',
+        title: 'Tomando un taxi',
+        desc: 'Un pasajero toma un taxi hacia el aeropuerto.',
+        turns: [
+          { speaker: 'Pasajero', en: 'Hi, can you take me to the airport?', es: 'Hola, ¿me puedes llevar al aeropuerto?' },
+          { speaker: 'Conductor', en: 'Sure. Which terminal?', es: 'Claro. ¿Qué terminal?' },
+          { speaker: 'Pasajero', en: 'Terminal Two, please.', es: 'Terminal dos, por favor.' },
+          { speaker: 'Conductor', en: 'Do you have luggage?', es: '¿Tiene equipaje?' },
+          { speaker: 'Pasajero', en: 'Yes, one suitcase.', es: 'Sí, una maleta.' },
+          { speaker: 'Conductor', en: 'How much time do you have?', es: '¿Cuánto tiempo tiene?' },
+          { speaker: 'Pasajero', en: 'My flight is at three.', es: 'Mi vuelo es a las tres.' },
+          { speaker: 'Conductor', en: "We'll be there in twenty minutes.", es: 'Estaremos ahí en veinte minutos.' },
+          { speaker: 'Pasajero', en: 'Great. Thank you.', es: 'Genial. Gracias.' },
+          { speaker: 'Conductor', en: 'Please put on your seatbelt.', es: 'Por favor póngase el cinturón.' }
+        ]
+      },
+      friends: {
+        label: 'Amigos',
+        title: 'Haciendo planes',
+        desc: 'Dos amigos coordinan un plan para el fin de semana.',
+        turns: [
+          { speaker: 'Sofía', en: 'Hey, are you free this weekend?', es: 'Oye, ¿estás libre este fin de semana?' },
+          { speaker: 'Marco', en: 'Yes, I have no plans.', es: 'Sí, no tengo planes.' },
+          { speaker: 'Sofía', en: 'Do you want to see a movie?', es: '¿Quieres ir al cine?' },
+          { speaker: 'Marco', en: 'Sure, which one?', es: 'Claro, ¿cuál?' },
+          { speaker: 'Sofía', en: "There's a new comedy playing.", es: 'Hay una nueva comedia en cartelera.' },
+          { speaker: 'Marco', en: 'Sounds fun. What time?', es: 'Suena divertido. ¿A qué hora?' },
+          { speaker: 'Sofía', en: 'Saturday at seven.', es: 'Sábado a las siete.' },
+          { speaker: 'Marco', en: 'Perfect. Where do we meet?', es: 'Perfecto. ¿Dónde nos encontramos?' },
+          { speaker: 'Sofía', en: 'At the cinema entrance.', es: 'En la entrada del cine.' },
+          { speaker: 'Marco', en: 'See you there!', es: '¡Nos vemos allá!' }
+        ]
+      },
+      family: {
+        label: 'Familia',
+        title: 'Cena familiar',
+        desc: 'Una madre y su hijo hablan durante la hora de la cena.',
+        turns: [
+          { speaker: 'Mamá', en: 'Dinner is ready!', es: '¡La cena está lista!' },
+          { speaker: 'Hijo', en: 'What are we having?', es: '¿Qué vamos a comer?' },
+          { speaker: 'Mamá', en: 'Chicken with rice and salad.', es: 'Pollo con arroz y ensalada.' },
+          { speaker: 'Hijo', en: 'Smells great. Can I help?', es: 'Huele delicioso. ¿Puedo ayudar?' },
+          { speaker: 'Mamá', en: 'Please set the table.', es: 'Por favor pon la mesa.' },
+          { speaker: 'Hijo', en: "Where's dad?", es: '¿Dónde está papá?' },
+          { speaker: 'Mamá', en: "He's coming from work now.", es: 'Viene del trabajo ahora.' },
+          { speaker: 'Hijo', en: "Can I eat now? I'm hungry.", es: '¿Puedo comer ahora? Tengo hambre.' },
+          { speaker: 'Mamá', en: 'Wait five minutes, please.', es: 'Espera cinco minutos, por favor.' },
+          { speaker: 'Hijo', en: "Okay, I'll wait.", es: 'Ok, esperaré.' }
+        ]
+      },
+      supermarket: {
+        label: 'Supermercado',
+        title: 'De compras',
+        desc: 'Un cliente busca productos y pregunta al empleado.',
+        turns: [
+          { speaker: 'Cliente', en: "Excuse me, where's the bread?", es: 'Disculpe, ¿dónde está el pan?' },
+          { speaker: 'Empleado', en: 'Aisle four, on your left.', es: 'Pasillo cuatro, a su izquierda.' },
+          { speaker: 'Cliente', en: 'Thanks. Do you have fresh milk?', es: 'Gracias. ¿Tienen leche fresca?' },
+          { speaker: 'Empleado', en: 'Yes, in the back of the store.', es: 'Sí, al fondo de la tienda.' },
+          { speaker: 'Cliente', en: 'How much is this cheese?', es: '¿Cuánto cuesta este queso?' },
+          { speaker: 'Empleado', en: 'Six dollars per pound.', es: 'Seis dólares la libra.' },
+          { speaker: 'Cliente', en: "I'll take half a pound.", es: 'Me llevo media libra.' },
+          { speaker: 'Empleado', en: 'Anything else?', es: '¿Algo más?' },
+          { speaker: 'Cliente', en: "That's all for today.", es: 'Eso es todo por hoy.' },
+          { speaker: 'Empleado', en: 'Please pay at the register.', es: 'Por favor pague en la caja.' }
+        ]
+      }
+    }
+  },
+  medium: {
+    label: 'Intermedio', tag: 'B1 · B2',
+    categories: {
+      airport: {
+        label: 'Aeropuerto',
+        title: 'Check-in en el aeropuerto',
+        desc: 'Un pasajero hace su check-in antes de un vuelo internacional.',
+        turns: [
+          { speaker: 'Agente', en: 'Good morning. Can I have your passport and ticket?', es: 'Buenos días. ¿Me da su pasaporte y boleto?' },
+          { speaker: 'Pasajero', en: 'Here they are.', es: 'Aquí están.' },
+          { speaker: 'Agente', en: 'Where are you flying today?', es: '¿A dónde vuela hoy?' },
+          { speaker: 'Pasajero', en: 'To Miami, connecting to Lima.', es: 'A Miami, con conexión a Lima.' },
+          { speaker: 'Agente', en: 'How many bags are you checking in?', es: '¿Cuántas maletas va a documentar?' },
+          { speaker: 'Pasajero', en: 'Just one, this suitcase.', es: 'Solo una, esta maleta.' },
+          { speaker: 'Agente', en: 'Please put it on the scale. Any electronics inside?', es: 'Por favor póngala en la balanza. ¿Algún electrónico dentro?' },
+          { speaker: 'Pasajero', en: "A laptop, but I'll take it out at security.", es: 'Una laptop, pero la saco en seguridad.' },
+          { speaker: 'Agente', en: 'Perfect. Would you prefer a window or aisle seat?', es: 'Perfecto. ¿Prefiere ventana o pasillo?' },
+          { speaker: 'Pasajero', en: 'Window, if possible.', es: 'Ventana, si es posible.' },
+          { speaker: 'Agente', en: "You got it. Here's your boarding pass. Gate B12.", es: 'Listo. Aquí su pase de abordar. Puerta B12.' },
+          { speaker: 'Pasajero', en: 'What time do we board?', es: '¿A qué hora abordamos?' },
+          { speaker: 'Agente', en: 'Boarding starts at 10:30. Have a good flight.', es: 'El abordaje comienza a las 10:30. Buen vuelo.' }
+        ]
+      },
+      doctor: {
+        label: 'Doctor',
+        title: 'Consulta médica',
+        desc: 'Un paciente describe sus síntomas al doctor.',
+        turns: [
+          { speaker: 'Doctor', en: 'Good morning. What brings you in today?', es: 'Buenos días. ¿Qué lo trae por aquí hoy?' },
+          { speaker: 'Paciente', en: "I've had a headache for three days.", es: 'He tenido dolor de cabeza por tres días.' },
+          { speaker: 'Doctor', en: 'Is it constant, or does it come and go?', es: '¿Es constante o va y viene?' },
+          { speaker: 'Paciente', en: 'Mostly in the morning and evening.', es: 'Sobre todo en la mañana y en la noche.' },
+          { speaker: 'Doctor', en: 'Any other symptoms? Fever, nausea?', es: '¿Otros síntomas? ¿Fiebre, náuseas?' },
+          { speaker: 'Paciente', en: 'A little dizzy sometimes.', es: 'Un poco mareado a veces.' },
+          { speaker: 'Doctor', en: "How's your sleep been?", es: '¿Cómo ha estado tu sueño?' },
+          { speaker: 'Paciente', en: 'Not great, honestly. Maybe five hours.', es: 'No muy bueno, honestamente. Tal vez cinco horas.' },
+          { speaker: 'Doctor', en: 'That could be part of it. Are you drinking enough water?', es: 'Eso podría ser parte del problema. ¿Estás tomando suficiente agua?' },
+          { speaker: 'Paciente', en: 'Probably not.', es: 'Probablemente no.' },
+          { speaker: 'Doctor', en: "Let's start with rest, water, and mild painkillers.", es: 'Empecemos con descanso, agua y analgésicos suaves.' },
+          { speaker: 'Paciente', en: 'Should I be worried?', es: '¿Debería preocuparme?' },
+          { speaker: 'Doctor', en: "Not yet. If it doesn't improve in a week, come back.", es: 'Todavía no. Si no mejora en una semana, regresa.' }
+        ]
+      },
+      restaurant: {
+        label: 'Restaurante',
+        title: 'Cena con reserva',
+        desc: 'Una pareja llega a un restaurante y ordena la cena.',
+        turns: [
+          { speaker: 'Anfitrión', en: 'Good evening. Do you have a reservation?', es: 'Buenas noches. ¿Tienen reserva?' },
+          { speaker: 'Cliente', en: 'Yes, under the name Ramirez, for two.', es: 'Sí, a nombre de Ramirez, para dos.' },
+          { speaker: 'Anfitrión', en: 'Right, seven-thirty. Your table is ready.', es: 'Correcto, las siete y media. Su mesa está lista.' },
+          { speaker: 'Cliente', en: 'Great, thank you.', es: 'Genial, gracias.' },
+          { speaker: 'Mesero', en: 'Welcome. Can I get you something to drink?', es: 'Bienvenidos. ¿Les traigo algo de tomar?' },
+          { speaker: 'Cliente', en: 'A glass of red wine for me, please.', es: 'Una copa de vino tinto para mí, por favor.' },
+          { speaker: 'Mesero', en: 'Excellent choice. Are you ready to order?', es: 'Excelente elección. ¿Están listos para ordenar?' },
+          { speaker: 'Cliente', en: 'We need a few more minutes.', es: 'Necesitamos unos minutos más.' },
+          { speaker: 'Mesero', en: "Take your time. I'll be right back.", es: 'Tómense su tiempo. Ya regreso.' },
+          { speaker: 'Cliente', en: 'What do you recommend?', es: '¿Qué recomienda?' },
+          { speaker: 'Mesero', en: 'The seafood pasta is very popular tonight.', es: 'La pasta con mariscos es muy popular esta noche.' },
+          { speaker: 'Cliente', en: "That sounds perfect. We'll have two.", es: 'Suena perfecto. Traiga dos, por favor.' }
+        ]
+      },
+      appointment: {
+        label: 'Llamada',
+        title: 'Programando una cita',
+        desc: 'Un paciente llama a la clínica dental para reservar una limpieza.',
+        turns: [
+          { speaker: 'Recepcionista', en: 'Dental Clinic, how may I help you?', es: 'Clínica Dental, ¿en qué puedo ayudarle?' },
+          { speaker: 'Cliente', en: "Hi, I'd like to schedule a cleaning.", es: 'Hola, me gustaría agendar una limpieza.' },
+          { speaker: 'Recepcionista', en: 'Are you a new patient?', es: '¿Es paciente nuevo?' },
+          { speaker: 'Cliente', en: "No, I've been here before.", es: 'No, ya he venido antes.' },
+          { speaker: 'Recepcionista', en: 'Can I have your name?', es: '¿Me da su nombre?' },
+          { speaker: 'Cliente', en: 'Erick Huamani.', es: 'Erick Huamani.' },
+          { speaker: 'Recepcionista', en: 'Let me check. Do you prefer morning or afternoon?', es: 'Déjeme revisar. ¿Prefiere mañana o tarde?' },
+          { speaker: 'Cliente', en: 'Afternoon works better for me.', es: 'La tarde me funciona mejor.' },
+          { speaker: 'Recepcionista', en: 'Would Thursday at 3 PM work?', es: '¿Le sirve el jueves a las 3 PM?' },
+          { speaker: 'Cliente', en: 'Could we do Friday instead?', es: '¿Podría ser el viernes mejor?' },
+          { speaker: 'Recepcionista', en: 'Friday at the same time is available.', es: 'El viernes a la misma hora está disponible.' },
+          { speaker: 'Cliente', en: 'Perfect, book me for that.', es: 'Perfecto, agéndeme para eso.' },
+          { speaker: 'Recepcionista', en: 'Done. See you Friday at 3.', es: 'Listo. Nos vemos el viernes a las 3.' }
+        ]
+      },
+      standup: {
+        label: 'Standup',
+        title: 'Standup diario del equipo',
+        desc: 'Reunión matutina del equipo de desarrollo para dar actualizaciones.',
+        turns: [
+          { speaker: 'Manager', en: "Good morning, team. Let's do a quick standup.", es: 'Buenos días, equipo. Hagamos un standup rápido.' },
+          { speaker: 'Ana', en: "I'll start. Yesterday I finished the login feature.", es: 'Yo empiezo. Ayer terminé la funcionalidad de login.' },
+          { speaker: 'Manager', en: 'Any blockers?', es: '¿Algún bloqueo?' },
+          { speaker: 'Ana', en: "No, all good. Today I'll start on the dashboard.", es: 'No, todo bien. Hoy empiezo con el dashboard.' },
+          { speaker: 'Manager', en: 'Great. David, how about you?', es: 'Genial. David, ¿tú qué tal?' },
+          { speaker: 'David', en: 'I ran into an issue with the API.', es: 'Me topé con un problema en el API.' },
+          { speaker: 'Manager', en: 'What kind of issue?', es: '¿Qué tipo de problema?' },
+          { speaker: 'David', en: 'The authentication is failing intermittently.', es: 'La autenticación falla de manera intermitente.' },
+          { speaker: 'Manager', en: 'Have you talked to Carlos about it?', es: '¿Ya hablaste con Carlos sobre eso?' },
+          { speaker: 'David', en: "Not yet. I'll ping him after this.", es: 'Todavía no. Le escribo después de esto.' },
+          { speaker: 'Manager', en: "Good. Let's regroup at 3 to review progress.", es: 'Bien. Reagrupemos a las 3 para revisar avances.' },
+          { speaker: 'Ana', en: 'Sounds good.', es: 'Suena bien.' }
+        ]
+      },
+      bank: {
+        label: 'Banco',
+        title: 'Abriendo una cuenta',
+        desc: 'Un cliente abre una cuenta corriente personal en el banco.',
+        turns: [
+          { speaker: 'Cliente', en: "Hi, I'd like to open a new account.", es: 'Hola, me gustaría abrir una cuenta nueva.' },
+          { speaker: 'Cajero', en: 'Sure. Personal or business?', es: 'Claro. ¿Personal o de negocios?' },
+          { speaker: 'Cliente', en: 'Personal, checking account please.', es: 'Personal, cuenta corriente por favor.' },
+          { speaker: 'Cajero', en: 'Do you have an ID with you?', es: '¿Tiene identificación con usted?' },
+          { speaker: 'Cliente', en: "Yes, here's my passport.", es: 'Sí, aquí está mi pasaporte.' },
+          { speaker: 'Cajero', en: 'Any proof of address?', es: '¿Algún comprobante de domicilio?' },
+          { speaker: 'Cliente', en: 'I brought a utility bill.', es: 'Traje un recibo de servicios.' },
+          { speaker: 'Cajero', en: "Perfect. What's the initial deposit?", es: 'Perfecto. ¿Cuál es el depósito inicial?' },
+          { speaker: 'Cliente', en: 'Five hundred dollars.', es: 'Quinientos dólares.' },
+          { speaker: 'Cajero', en: 'Would you like online banking access?', es: '¿Desea acceso a banca en línea?' },
+          { speaker: 'Cliente', en: 'Yes, that would be helpful.', es: 'Sí, sería útil.' },
+          { speaker: 'Cajero', en: 'Great. Your card will arrive in a week.', es: 'Genial. Su tarjeta llegará en una semana.' }
+        ]
+      },
+      apartment: {
+        label: 'Alquiler',
+        title: 'Rentando un departamento',
+        desc: 'Un interesado consulta las condiciones con el propietario.',
+        turns: [
+          { speaker: 'Interesado', en: 'Is the apartment still available?', es: '¿El departamento todavía está disponible?' },
+          { speaker: 'Propietario', en: 'Yes, it is. Would you like to see it?', es: 'Sí, lo está. ¿Le gustaría verlo?' },
+          { speaker: 'Interesado', en: 'Can I visit tomorrow at six?', es: '¿Puedo visitarlo mañana a las seis?' },
+          { speaker: 'Propietario', en: 'That works. How many people will live there?', es: 'Me funciona. ¿Cuántas personas vivirán ahí?' },
+          { speaker: 'Interesado', en: 'Just me.', es: 'Solo yo.' },
+          { speaker: 'Propietario', en: 'The rent is nine hundred, plus utilities.', es: 'La renta es novecientos, más servicios.' },
+          { speaker: 'Interesado', en: 'Does that include parking?', es: '¿Incluye estacionamiento?' },
+          { speaker: 'Propietario', en: 'Parking is fifty extra.', es: 'Estacionamiento son cincuenta extra.' },
+          { speaker: 'Interesado', en: 'Any pet policy?', es: '¿Hay política de mascotas?' },
+          { speaker: 'Propietario', en: 'Small pets are allowed with a deposit.', es: 'Se permiten mascotas pequeñas con depósito.' },
+          { speaker: 'Interesado', en: "What's the lease length?", es: '¿Cuál es la duración del contrato?' },
+          { speaker: 'Propietario', en: 'Standard is twelve months.', es: 'Lo estándar es doce meses.' }
+        ]
+      },
+      gym: {
+        label: 'Gimnasio',
+        title: 'Membresía de gimnasio',
+        desc: 'Un cliente se inscribe en un gimnasio nuevo.',
+        turns: [
+          { speaker: 'Cliente', en: "Hi, I'd like to sign up for a membership.", es: 'Hola, me gustaría inscribirme para una membresía.' },
+          { speaker: 'Recepcionista', en: 'Great. Do you prefer monthly or annual?', es: 'Genial. ¿Prefiere mensual o anual?' },
+          { speaker: 'Cliente', en: "What's the difference in price?", es: '¿Cuál es la diferencia de precio?' },
+          { speaker: 'Recepcionista', en: 'Monthly is fifty, annual is five hundred.', es: 'Mensual son cincuenta, anual son quinientos.' },
+          { speaker: 'Cliente', en: 'The annual saves money.', es: 'La anual ahorra dinero.' },
+          { speaker: 'Recepcionista', en: 'Yes, two months free.', es: 'Sí, dos meses gratis.' },
+          { speaker: 'Cliente', en: 'Does that include classes?', es: '¿Incluye las clases?' },
+          { speaker: 'Recepcionista', en: 'Yes, all classes are included.', es: 'Sí, todas las clases están incluidas.' },
+          { speaker: 'Cliente', en: 'When are the yoga sessions?', es: '¿Cuándo son las clases de yoga?' },
+          { speaker: 'Recepcionista', en: 'Every morning at seven.', es: 'Todas las mañanas a las siete.' },
+          { speaker: 'Cliente', en: "Perfect. I'll take the annual plan.", es: 'Perfecto. Me quedo con el plan anual.' },
+          { speaker: 'Recepcionista', en: 'Welcome to the gym!', es: '¡Bienvenido al gimnasio!' }
+        ]
+      },
+      customerService: {
+        label: 'Servicio al cliente',
+        title: 'Queja por un pedido',
+        desc: 'Un cliente reclama por un envío incorrecto.',
+        turns: [
+          { speaker: 'Cliente', en: 'Hi, I have a problem with my order.', es: 'Hola, tengo un problema con mi pedido.' },
+          { speaker: 'Agente', en: "I'm sorry to hear that. What happened?", es: 'Lamento oír eso. ¿Qué pasó?' },
+          { speaker: 'Cliente', en: 'The wrong item was delivered.', es: 'Me entregaron el artículo equivocado.' },
+          { speaker: 'Agente', en: 'Can you share your order number?', es: '¿Puede compartir su número de orden?' },
+          { speaker: 'Cliente', en: "It's 45678.", es: 'Es 45678.' },
+          { speaker: 'Agente', en: 'Let me check. Yes, I see the error.', es: 'Déjeme revisar. Sí, veo el error.' },
+          { speaker: 'Cliente', en: 'Can you send the correct item?', es: '¿Pueden enviar el artículo correcto?' },
+          { speaker: 'Agente', en: "Absolutely. We'll ship it today.", es: 'Por supuesto. Lo enviamos hoy.' },
+          { speaker: 'Cliente', en: 'What about the wrong one?', es: '¿Y qué hago con el equivocado?' },
+          { speaker: 'Agente', en: 'Keep it or return it, no charge.', es: 'Quédeselo o devuélvalo, sin cargo.' },
+          { speaker: 'Cliente', en: 'Thanks. When will it arrive?', es: 'Gracias. ¿Cuándo llegará?' },
+          { speaker: 'Agente', en: 'Within two business days.', es: 'Dentro de dos días hábiles.' }
+        ]
+      },
+      date: {
+        label: 'Primera cita',
+        title: 'En una primera cita',
+        desc: 'Dos personas se conocen en una primera cita en un restaurante.',
+        turns: [
+          { speaker: 'Diego', en: 'Thanks for meeting me here.', es: 'Gracias por vernos aquí.' },
+          { speaker: 'Laura', en: 'My pleasure. This place is nice.', es: 'Con gusto. Este lugar es lindo.' },
+          { speaker: 'Diego', en: 'I come here often. Try the pasta.', es: 'Vengo seguido. Prueba la pasta.' },
+          { speaker: 'Laura', en: 'Sounds good. What do you do for work?', es: 'Suena bien. ¿A qué te dedicas?' },
+          { speaker: 'Diego', en: "I'm a graphic designer. And you?", es: 'Soy diseñador gráfico. ¿Y tú?' },
+          { speaker: 'Laura', en: 'I work in marketing at a startup.', es: 'Trabajo en marketing en una startup.' },
+          { speaker: 'Diego', en: 'That sounds exciting.', es: 'Eso suena emocionante.' },
+          { speaker: 'Laura', en: 'It has its moments. Do you enjoy design?', es: 'Tiene sus momentos. ¿Disfrutas el diseño?' },
+          { speaker: 'Diego', en: 'Most of the time, yes.', es: 'La mayor parte del tiempo, sí.' },
+          { speaker: 'Laura', en: 'What do you do on weekends?', es: '¿Qué haces los fines de semana?' },
+          { speaker: 'Diego', en: 'Hiking, mostly. Do you like the outdoors?', es: 'Senderismo, sobre todo. ¿Te gusta el aire libre?' },
+          { speaker: 'Laura', en: 'I love it. We should go sometime.', es: 'Me encanta. Deberíamos ir algún día.' }
+        ]
+      }
+    }
+  },
+  hard: {
+    label: 'Avanzado', tag: 'C1 · C2',
+    categories: {
+      interview: {
+        label: 'Entrevista',
+        title: 'Entrevista para Senior Developer',
+        desc: 'Un candidato senior es entrevistado para un puesto técnico de liderazgo.',
+        turns: [
+          { speaker: 'Interviewer', en: "Thanks for coming in. Let's start with a bit about yourself.", es: 'Gracias por venir. Empecemos con un poco sobre ti.' },
+          { speaker: 'Candidate', en: "Sure. I've been a software engineer for seven years, mostly focused on backend systems.", es: 'Claro. He sido ingeniero de software por siete años, enfocado principalmente en sistemas backend.' },
+          { speaker: 'Interviewer', en: 'What draws you to our company?', es: '¿Qué te atrae de nuestra empresa?' },
+          { speaker: 'Candidate', en: "Your work on distributed systems is aligned with what I'm passionate about.", es: 'Su trabajo en sistemas distribuidos está alineado con lo que me apasiona.' },
+          { speaker: 'Interviewer', en: 'Tell me about a challenging project you led.', es: 'Cuéntame de un proyecto desafiante que hayas liderado.' },
+          { speaker: 'Candidate', en: 'We migrated a monolith to microservices without downtime.', es: 'Migramos un monolito a microservicios sin tiempo fuera de servicio.' },
+          { speaker: 'Interviewer', en: 'How did you handle the team dynamics?', es: '¿Cómo manejaste la dinámica del equipo?' },
+          { speaker: 'Candidate', en: 'Communication was key. We held daily syncs and monthly retros.', es: 'La comunicación fue clave. Teníamos syncs diarios y retros mensuales.' },
+          { speaker: 'Interviewer', en: "What's a weakness you're working on?", es: '¿Qué debilidad estás trabajando en mejorar?' },
+          { speaker: 'Candidate', en: "I tend to over-engineer. I'm learning to prioritize shipping.", es: 'Tiendo a sobre-ingenierizar. Estoy aprendiendo a priorizar entregar.' },
+          { speaker: 'Interviewer', en: 'Where do you see yourself in five years?', es: '¿Dónde te ves en cinco años?' },
+          { speaker: 'Candidate', en: 'Leading a technical team, ideally in a company like this one.', es: 'Liderando un equipo técnico, idealmente en una empresa como esta.' },
+          { speaker: 'Interviewer', en: 'Any questions for us?', es: '¿Alguna pregunta para nosotros?' },
+          { speaker: 'Candidate', en: 'Yes, how does the team handle technical debt?', es: 'Sí, ¿cómo maneja el equipo la deuda técnica?' }
+        ]
+      },
+      negotiation: {
+        label: 'Negociación',
+        title: 'Cerrando un contrato',
+        desc: 'Un vendedor y un cliente negocian los términos finales de un contrato.',
+        turns: [
+          { speaker: 'Cliente', en: "We've reviewed your proposal, but the price is a concern.", es: 'Revisamos su propuesta, pero el precio es una preocupación.' },
+          { speaker: 'Vendedor', en: 'I understand. What number were you thinking?', es: 'Entiendo. ¿Qué cifra tenían en mente?' },
+          { speaker: 'Cliente', en: 'We were hoping for something closer to fifty thousand.', es: 'Esperábamos algo cerca de cincuenta mil.' },
+          { speaker: 'Vendedor', en: "That's significantly below our standard rate.", es: 'Eso está muy por debajo de nuestra tarifa estándar.' },
+          { speaker: 'Cliente', en: "We're a long-term partner, though. That should count.", es: 'Pero somos un socio a largo plazo. Eso debería contar.' },
+          { speaker: 'Vendedor', en: 'It does. Let me see what I can do.', es: 'Sí cuenta. Déjeme ver qué puedo hacer.' },
+          { speaker: 'Cliente', en: "We'd also need faster delivery.", es: 'También necesitaríamos entrega más rápida.' },
+          { speaker: 'Vendedor', en: 'Faster delivery would push the price back up.', es: 'Una entrega más rápida subiría el precio de nuevo.' },
+          { speaker: 'Cliente', en: 'Can we meet halfway? Sixty thousand with priority timeline?', es: '¿Podemos encontrarnos a mitad de camino? ¿Sesenta mil con línea de tiempo prioritaria?' },
+          { speaker: 'Vendedor', en: "I'll need to run this by my director.", es: 'Voy a necesitar consultarlo con mi director.' },
+          { speaker: 'Cliente', en: 'How long will that take?', es: '¿Cuánto tiempo tomará eso?' },
+          { speaker: 'Vendedor', en: 'I can have an answer by end of day tomorrow.', es: 'Puedo tener una respuesta al final del día de mañana.' },
+          { speaker: 'Cliente', en: "Fair enough. Let's touch base then.", es: 'Justo. Hablemos entonces.' }
+        ]
+      },
+      executive: {
+        label: 'Ejecutivo',
+        title: 'Reunión ejecutiva de estrategia',
+        desc: 'La C-Suite discute prioridades del Q4 y responde a datos preocupantes.',
+        turns: [
+          { speaker: 'CEO', en: "Let's discuss Q4 priorities. Sarah, start us off.", es: 'Discutamos las prioridades del Q4. Sarah, empieza tú.' },
+          { speaker: 'Sarah', en: 'Revenue is up 12%, but customer churn is our biggest risk.', es: 'Los ingresos subieron 12%, pero la fuga de clientes es nuestro mayor riesgo.' },
+          { speaker: 'CEO', en: "What's driving the churn?", es: '¿Qué está causando la fuga?' },
+          { speaker: 'Sarah', en: 'Two things: onboarding friction and support response times.', es: 'Dos cosas: fricción en el onboarding y tiempos de respuesta de soporte.' },
+          { speaker: 'Marcus', en: "I'd push back on the onboarding claim. Our data shows completion at 80%.", es: 'Cuestionaría la afirmación sobre el onboarding. Nuestros datos muestran 80% de completitud.' },
+          { speaker: 'Sarah', en: "Completion isn't retention. Users complete but don't return.", es: 'Completar no es retener. Los usuarios completan pero no regresan.' },
+          { speaker: 'CEO', en: "Fair point. What's the proposed fix?", es: 'Buen punto. ¿Cuál es la solución propuesta?' },
+          { speaker: 'Sarah', en: 'Invest in a customer success team.', es: 'Invertir en un equipo de customer success.' },
+          { speaker: 'Marcus', en: "That's expensive. Have we explored automation first?", es: 'Eso es costoso. ¿Hemos explorado automatización primero?' },
+          { speaker: 'Sarah', en: 'We have. It moved the needle 3%. Human touch moves it 15%.', es: 'Sí lo hicimos. Movió la aguja 3%. El toque humano la mueve 15%.' },
+          { speaker: 'CEO', en: "Let's see the numbers. Can you present a full proposal next week?", es: 'Veamos los números. ¿Puedes presentar una propuesta completa la próxima semana?' },
+          { speaker: 'Sarah', en: "Absolutely. I'll circulate it by Monday.", es: 'Por supuesto. La circulo el lunes.' },
+          { speaker: 'CEO', en: "Great. Let's move on to product roadmap.", es: 'Genial. Pasemos al roadmap de producto.' }
+        ]
+      },
+      feedback: {
+        label: 'Feedback',
+        title: '1-on-1 de feedback',
+        desc: 'Un manager da feedback constructivo a un reporte directo.',
+        turns: [
+          { speaker: 'Manager', en: 'Thanks for making time. I want to talk about your recent performance.', es: 'Gracias por hacer tiempo. Quiero hablar sobre tu desempeño reciente.' },
+          { speaker: 'Reporte', en: 'Sure, I appreciate the check-in.', es: 'Claro, aprecio el chequeo.' },
+          { speaker: 'Manager', en: "You've been consistently delivering high-quality work.", es: 'Has entregado consistentemente trabajo de alta calidad.' },
+          { speaker: 'Reporte', en: "Thank you. I've been trying to level up my code reviews.", es: 'Gracias. He estado tratando de mejorar mis revisiones de código.' },
+          { speaker: 'Manager', en: "I've noticed. However, I want to raise a concern.", es: 'Lo he notado. Sin embargo, quiero plantear una preocupación.' },
+          { speaker: 'Reporte', en: "Okay, what's on your mind?", es: 'Ok, ¿qué tienes en mente?' },
+          { speaker: 'Manager', en: "You've been quiet in team meetings lately.", es: 'Has estado callado en las reuniones últimamente.' },
+          { speaker: 'Reporte', en: "I've felt like my ideas aren't landing.", es: 'He sentido que mis ideas no aterrizan.' },
+          { speaker: 'Manager', en: 'I hear that. Can you give me a specific example?', es: 'Te escucho. ¿Puedes darme un ejemplo específico?' },
+          { speaker: 'Reporte', en: 'Last week I suggested a refactor and it got dismissed quickly.', es: 'La semana pasada sugerí un refactor y fue descartado rápidamente.' },
+          { speaker: 'Manager', en: "That's fair. I'll be more mindful of creating space for you.", es: 'Es justo. Seré más consciente de crear espacio para ti.' },
+          { speaker: 'Reporte', en: "I appreciate that. I'll also work on advocating for my ideas more clearly.", es: 'Lo aprecio. Yo también trabajaré en defender mis ideas más claramente.' },
+          { speaker: 'Manager', en: "Let's revisit this in two weeks and see how it's going.", es: 'Volvamos a esto en dos semanas y veamos cómo va.' }
+        ]
+      },
+      pitch: {
+        label: 'Presentación',
+        title: 'Pitch a stakeholders',
+        desc: 'Un líder de producto presenta una propuesta de inversión a stakeholders.',
+        turns: [
+          { speaker: 'Presentador', en: "Thanks for gathering. Today I'll walk you through our proposal.", es: 'Gracias por reunirse. Hoy los guiaré a través de nuestra propuesta.' },
+          { speaker: 'Stakeholder', en: 'How long will this take?', es: '¿Cuánto tomará esto?' },
+          { speaker: 'Presentador', en: 'Fifteen minutes for the pitch, then Q&A.', es: 'Quince minutos para el pitch, luego preguntas.' },
+          { speaker: 'Stakeholder', en: 'Please go ahead.', es: 'Adelante, por favor.' },
+          { speaker: 'Presentador', en: 'Our research shows a clear gap in the mid-market segment.', es: 'Nuestra investigación muestra una clara brecha en el segmento medio.' },
+          { speaker: 'Stakeholder', en: "What's the size of that opportunity?", es: '¿Cuál es el tamaño de esa oportunidad?' },
+          { speaker: 'Presentador', en: 'We estimate two hundred million in addressable revenue.', es: 'Estimamos doscientos millones en ingresos direccionables.' },
+          { speaker: 'Stakeholder', en: 'And the required investment?', es: '¿Y la inversión requerida?' },
+          { speaker: 'Presentador', en: 'Twelve million over eighteen months.', es: 'Doce millones a lo largo de dieciocho meses.' },
+          { speaker: 'Stakeholder', en: "That's substantial. What's the expected ROI?", es: 'Eso es considerable. ¿Cuál es el ROI esperado?' },
+          { speaker: 'Presentador', en: 'Break-even by month twenty-four, three-x return by year three.', es: 'Punto de equilibrio al mes veinticuatro, retorno de 3x al año tres.' },
+          { speaker: 'Stakeholder', en: 'What are the main risks?', es: '¿Cuáles son los principales riesgos?' },
+          { speaker: 'Presentador', en: 'Execution speed and competitive response. Both are manageable.', es: 'Velocidad de ejecución y respuesta competitiva. Ambos son manejables.' },
+          { speaker: 'Stakeholder', en: "Let's take this to the board next month.", es: 'Llevemos esto al directorio el próximo mes.' },
+          { speaker: 'Presentador', en: "I'll prepare a full briefing document.", es: 'Prepararé un documento completo de briefing.' }
+        ]
+      },
+      debate: {
+        label: 'Debate político',
+        title: 'Debate presidencial',
+        desc: 'Dos candidatos se enfrentan sobre política económica.',
+        turns: [
+          { speaker: 'Moderador', en: "Let's turn to economic policy. Your response?", es: 'Pasemos a la política económica. ¿Su respuesta?' },
+          { speaker: 'Candidato A', en: 'The current administration has failed working families.', es: 'La administración actual ha fallado a las familias trabajadoras.' },
+          { speaker: 'Candidato B', en: "That's simply not supported by the data.", es: 'Eso simplemente no está respaldado por los datos.' },
+          { speaker: 'Candidato A', en: 'Wages have stagnated for a decade.', es: 'Los salarios se han estancado por una década.' },
+          { speaker: 'Candidato B', en: 'Real wages have grown for three consecutive quarters.', es: 'Los salarios reales han crecido por tres trimestres consecutivos.' },
+          { speaker: 'Candidato A', en: "You're cherry-picking statistics.", es: 'Está eligiendo estadísticas convenientes.' },
+          { speaker: 'Candidato B', en: "I'm citing verified government reports.", es: 'Estoy citando informes gubernamentales verificados.' },
+          { speaker: 'Moderador', en: 'Please stick to policy, not accusations.', es: 'Por favor apéguense a políticas, no acusaciones.' },
+          { speaker: 'Candidato A', en: 'My proposal is targeted tax relief for the middle class.', es: 'Mi propuesta es un alivio fiscal enfocado en la clase media.' },
+          { speaker: 'Candidato B', en: 'That would deepen the deficit substantially.', es: 'Eso profundizaría el déficit sustancialmente.' },
+          { speaker: 'Candidato A', en: 'Not if paired with corporate tax reform.', es: 'No si se combina con reforma tributaria corporativa.' },
+          { speaker: 'Candidato B', en: "The math simply doesn't add up.", es: 'Las cuentas simplemente no cuadran.' },
+          { speaker: 'Moderador', en: "Time. Let's move to the next question.", es: 'Se acabó el tiempo. Pasemos a la siguiente pregunta.' }
+        ]
+      },
+      academic: {
+        label: 'Conferencia académica',
+        title: 'Sesión de preguntas y respuestas',
+        desc: 'Un investigador defiende su tesis frente a la audiencia académica.',
+        turns: [
+          { speaker: 'Presentador', en: 'My hypothesis is that the correlation is causal.', es: 'Mi hipótesis es que la correlación es causal.' },
+          { speaker: 'Asistente', en: 'Have you controlled for confounding variables?', es: '¿Ha controlado por variables de confusión?' },
+          { speaker: 'Presentador', en: 'Yes, we adjusted for socioeconomic factors.', es: 'Sí, ajustamos por factores socioeconómicos.' },
+          { speaker: 'Asistente', en: 'What about selection bias in your sample?', es: '¿Y sobre el sesgo de selección en su muestra?' },
+          { speaker: 'Presentador', en: 'We used stratified random sampling.', es: 'Usamos muestreo aleatorio estratificado.' },
+          { speaker: 'Asistente', en: 'How reproducible are your findings?', es: '¿Qué tan reproducibles son sus hallazgos?' },
+          { speaker: 'Presentador', en: 'Two independent teams replicated the results.', es: 'Dos equipos independientes replicaron los resultados.' },
+          { speaker: 'Asistente', en: "What's the effect size?", es: '¿Cuál es el tamaño del efecto?' },
+          { speaker: 'Presentador', en: 'Point three eight, statistically significant.', es: 'Cero coma treinta y ocho, estadísticamente significativo.' },
+          { speaker: 'Asistente', en: 'Have peers reviewed the methodology?', es: '¿Han revisado colegas la metodología?' },
+          { speaker: 'Presentador', en: 'Yes, published in a top-tier journal.', es: 'Sí, publicado en una revista de primer nivel.' },
+          { speaker: 'Asistente', en: 'Fascinating work. Where do you go from here?', es: 'Trabajo fascinante. ¿Hacia dónde va desde aquí?' },
+          { speaker: 'Presentador', en: "We're expanding to a longitudinal study.", es: 'Estamos expandiendo a un estudio longitudinal.' }
+        ]
+      },
+      therapy: {
+        label: 'Terapia',
+        title: 'Sesión de terapia',
+        desc: 'Un paciente reflexiona sobre el estrés en su vida laboral.',
+        turns: [
+          { speaker: 'Terapeuta', en: 'How have you been feeling this week?', es: '¿Cómo te has sentido esta semana?' },
+          { speaker: 'Paciente', en: 'A bit overwhelmed, honestly.', es: 'Un poco abrumado, honestamente.' },
+          { speaker: 'Terapeuta', en: 'Can you tell me more about that?', es: '¿Puedes contarme más sobre eso?' },
+          { speaker: 'Paciente', en: 'Work has been relentless.', es: 'El trabajo ha sido implacable.' },
+          { speaker: 'Terapeuta', en: 'What specifically is triggering the stress?', es: '¿Qué específicamente está detonando el estrés?' },
+          { speaker: 'Paciente', en: 'I feel unable to say no to requests.', es: 'Me siento incapaz de decir no a las peticiones.' },
+          { speaker: 'Terapeuta', en: 'When did that pattern start?', es: '¿Cuándo comenzó ese patrón?' },
+          { speaker: 'Paciente', en: 'Probably in childhood.', es: 'Probablemente en la infancia.' },
+          { speaker: 'Terapeuta', en: 'How does your body respond to the stress?', es: '¿Cómo responde tu cuerpo al estrés?' },
+          { speaker: 'Paciente', en: 'Tight shoulders, poor sleep.', es: 'Hombros tensos, mal sueño.' },
+          { speaker: 'Terapeuta', en: 'Have you tried the grounding exercises?', es: '¿Has probado los ejercicios de anclaje?' },
+          { speaker: 'Paciente', en: 'Sometimes, but I forget in the moment.', es: 'A veces, pero se me olvidan en el momento.' },
+          { speaker: 'Terapeuta', en: "Let's practice setting one boundary this week.", es: 'Practiquemos poner un límite esta semana.' },
+          { speaker: 'Paciente', en: "I'll try. It's difficult.", es: 'Lo intentaré. Es difícil.' }
+        ]
+      },
+      networking: {
+        label: 'Networking',
+        title: 'Networking en conferencia',
+        desc: 'Una inversionista y un fundador se conocen en un evento profesional.',
+        turns: [
+          { speaker: 'Elena', en: "I don't think we've met. I'm Elena.", es: 'Creo que no nos conocemos. Soy Elena.' },
+          { speaker: 'James', en: "Nice to meet you, Elena. I'm James.", es: 'Mucho gusto, Elena. Soy James.' },
+          { speaker: 'Elena', en: 'What brings you to the conference?', es: '¿Qué te trae a la conferencia?' },
+          { speaker: 'James', en: 'I lead product at a fintech startup.', es: 'Lidero producto en una startup de fintech.' },
+          { speaker: 'Elena', en: "Interesting. What's your focus area?", es: 'Interesante. ¿Cuál es tu área de enfoque?' },
+          { speaker: 'James', en: 'Cross-border payments in emerging markets.', es: 'Pagos transfronterizos en mercados emergentes.' },
+          { speaker: 'Elena', en: "That's aligned with my portfolio.", es: 'Eso está alineado con mi portafolio.' },
+          { speaker: 'James', en: 'Are you an investor?', es: '¿Eres inversionista?' },
+          { speaker: 'Elena', en: 'Yes, I focus on Series A rounds.', es: 'Sí, me enfoco en rondas Serie A.' },
+          { speaker: 'James', en: "I'd love to explore a conversation.", es: 'Me encantaría explorar una conversación.' },
+          { speaker: 'Elena', en: "Let's exchange contacts.", es: 'Intercambiemos contactos.' },
+          { speaker: 'James', en: "I'll follow up next week with more context.", es: 'Haré seguimiento la próxima semana con más contexto.' },
+          { speaker: 'Elena', en: 'Looking forward to it.', es: 'Estaré atenta.' }
+        ]
+      },
+      legal: {
+        label: 'Consulta legal',
+        title: 'Consulta con un abogado',
+        desc: 'Un cliente busca asesoría por un despido injustificado.',
+        turns: [
+          { speaker: 'Abogado', en: 'Please describe the situation.', es: 'Por favor describa la situación.' },
+          { speaker: 'Cliente', en: 'I was wrongfully terminated last month.', es: 'Fui despedido injustificadamente el mes pasado.' },
+          { speaker: 'Abogado', en: 'Do you have documentation of the events?', es: '¿Tiene documentación de los hechos?' },
+          { speaker: 'Cliente', en: 'Emails and my performance reviews.', es: 'Correos y mis evaluaciones de desempeño.' },
+          { speaker: 'Abogado', en: 'Were you given a reason for termination?', es: '¿Le dieron una razón para el despido?' },
+          { speaker: 'Cliente', en: 'They cited restructuring, but hired someone new.', es: 'Citaron reestructuración, pero contrataron a alguien nuevo.' },
+          { speaker: 'Abogado', en: 'That could constitute pretext for discrimination.', es: 'Eso podría constituir un pretexto para discriminación.' },
+          { speaker: 'Cliente', en: 'What are my options?', es: '¿Cuáles son mis opciones?' },
+          { speaker: 'Abogado', en: 'Mediation, arbitration, or litigation.', es: 'Mediación, arbitraje o litigio.' },
+          { speaker: 'Cliente', en: 'Which is most likely to succeed?', es: '¿Cuál tiene más probabilidad de éxito?' },
+          { speaker: 'Abogado', en: 'It depends on the strength of the evidence.', es: 'Depende de la fuerza de la evidencia.' },
+          { speaker: 'Cliente', en: "What's your recommendation?", es: '¿Cuál es su recomendación?' },
+          { speaker: 'Abogado', en: 'Start with a formal complaint through HR channels.', es: 'Comience con una queja formal por canales de RRHH.' },
+          { speaker: 'Cliente', en: 'How long could this take?', es: '¿Cuánto podría tomar esto?' },
+          { speaker: 'Abogado', en: 'Anywhere from three months to two years.', es: 'De tres meses a dos años.' }
+        ]
+      }
+    }
+  }
+};
+
+// ============================================================
+//  STATE
+// ============================================================
+let state = {
+  mode: 'words',           // 'words' | 'phrases' | 'dialogues'
+  practiceMode: 'card',    // 'card' | 'dictation'
+  level: 'basic',
+  category: 'greetings',
+  index: 0,
+  flipped: false,
+  yes: new Set(),
+  no: new Set(),
+  reviewMode: false,
+  reviewDeck: []
+};
+let dictationState = { answered: false, wasCorrect: false };
+let dialogueState = { isPlayingAll: false, playIdx: 0, revealed: false };
+
+// ============================================================
+//  PERSISTENCE
+// ============================================================
+async function saveState() {
+  try {
+    if (window.storage && window.storage.set) {
+      await window.storage.set('flashcards:state', JSON.stringify({
+        mode: state.mode,
+        practiceMode: state.practiceMode,
+        level: state.level,
+        category: state.category,
+        yes: [...state.yes],
+        no: [...state.no]
+      }));
+    }
+  } catch (e) { /* ignore */ }
+}
+async function loadState() {
+  try {
+    if (window.storage && window.storage.get) {
+      const r = await window.storage.get('flashcards:state');
+      if (r && r.value) {
+        const data = JSON.parse(r.value);
+        if (['words','phrases','dialogues'].includes(data.mode)) state.mode = data.mode;
+        if (data.practiceMode === 'card' || data.practiceMode === 'dictation') {
+          state.practiceMode = data.practiceMode;
+        }
+        const dataset = currentDataset();
+        if (data.level && dataset[data.level]) state.level = data.level;
+        if (data.category && dataset[state.level].categories[data.category]) {
+          state.category = data.category;
+        } else {
+          state.category = Object.keys(dataset[state.level].categories)[0];
+        }
+        if (Array.isArray(data.yes)) state.yes = new Set(data.yes);
+        if (Array.isArray(data.no)) state.no = new Set(data.no);
+      }
+    }
+  } catch (e) { /* ignore */ }
+}
+
+// ============================================================
+//  HELPERS
+// ============================================================
+function currentDataset() {
+  if (state.mode === 'phrases') return PHRASES_DATA;
+  if (state.mode === 'dialogues') return DIALOGUES_DATA;
+  return WORDS_DATA;
+}
+function currentLevel() { return currentDataset()[state.level]; }
+function currentCategories() { return currentLevel().categories; }
+function currentDialogue() {
+  return currentCategories()[state.category];
+}
+function baseDeck() {
+  if (state.reviewMode) return state.reviewDeck;
+  return currentCategories()[state.category].items || [];
+}
+function currentDeck() {
+  const deck = baseDeck();
+  if (state.practiceMode === 'dictation') {
+    return deck.filter(c => !c.en.includes('___'));
+  }
+  return deck;
+}
+function keyFor(card) {
+  return `${state.mode}:${state.level}:${state.category}:${card.en}`;
+}
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeReg(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function normalizeAnswer(s) {
+  return s.toLowerCase().trim()
+    .replace(/[.,!?;:'"()¿¡]/g, '')
+    .replace(/\s+/g, ' ');
+}
+
+// ============================================================
+//  RENDER
+// ============================================================
+function renderModes() {
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === state.mode);
+  });
+}
+
+function renderPracticeToggle() {
+  document.querySelectorAll('.practice-toggle button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.practice === state.practiceMode);
+  });
+}
+
+function renderLevels() {
+  const el = document.getElementById('levels');
+  const dataset = currentDataset();
+  el.innerHTML = '';
+  Object.entries(dataset).forEach(([key, val]) => {
+    const btn = document.createElement('button');
+    btn.className = 'level-btn' + (key === state.level ? ' active' : '');
+    btn.innerHTML = `<span>${val.label}</span><span class="tag">${val.tag}</span>`;
+    btn.onclick = () => {
+      if (state.level === key) return;
+      state.level = key;
+      state.category = Object.keys(dataset[key].categories)[0];
+      state.index = 0;
+      state.flipped = false;
+      state.reviewMode = false;
+      state.reviewDeck = [];
+      resetDictation();
+      stopPlayAll();
+      render();
+      saveState();
+    };
+    el.appendChild(btn);
+  });
+  document.getElementById('levelBadge').textContent = currentLevel().tag;
+}
+
+function renderCategories() {
+  const el = document.getElementById('categories');
+  el.innerHTML = '';
+  Object.entries(currentCategories()).forEach(([key, val]) => {
+    const btn = document.createElement('button');
+    btn.className = 'cat' + (key === state.category && !state.reviewMode ? ' active' : '');
+    btn.textContent = val.label;
+    btn.onclick = () => {
+      state.category = key;
+      state.index = 0;
+      state.flipped = false;
+      state.reviewMode = false;
+      state.reviewDeck = [];
+      resetDictation();
+      stopPlayAll();
+      dialogueState.revealed = false;
+      render();
+      saveState();
+    };
+    el.appendChild(btn);
+  });
+}
+
+function renderCardFaces(card) {
+  const frontCenter = document.getElementById('frontCenter');
+  const backCenter = document.getElementById('backCenter');
+  const frontHint = document.getElementById('frontHint');
+  if (state.mode === 'phrases') {
+    frontCenter.innerHTML = `<div class="phrase">${escapeHtml(card.en)}</div>`;
+    backCenter.innerHTML = `
+      <div class="phrase-translation">${escapeHtml(card.es)}</div>
+      ${card.ctx ? `<div class="context">${escapeHtml(card.ctx)}</div>` : ''}
+    `;
+    frontHint.textContent = 'Toca para ver la traducción';
+  } else {
+    frontCenter.innerHTML = `<div class="word">${escapeHtml(card.en)}</div>`;
+    const exText = escapeHtml(card.ex);
+    const parts = card.en.split(/\s+/).map(escapeReg);
+    const pattern = new RegExp(`(${parts.join('\\s+')})`, 'i');
+    const example = exText.replace(pattern, '<strong>$1</strong>');
+    backCenter.innerHTML = `
+      <div class="translation">${escapeHtml(card.es)}</div>
+      <div class="example">${example}</div>
+    `;
+    frontHint.textContent = 'Toca para ver la traducción';
+  }
+}
+
+function updateStats() {
+  const prefix = `${state.mode}:${state.level}:${state.category}:`;
+  const yesInCat = [...state.yes].filter(k => k.startsWith(prefix)).length;
+  const noInCat = [...state.no].filter(k => k.startsWith(prefix)).length;
+  const statYes = document.getElementById('statYes');
+  const statNo = document.getElementById('statNo');
+  const dictYes = document.getElementById('dictStatYes');
+  const dictNo = document.getElementById('dictStatNo');
+  if (statYes) statYes.textContent = yesInCat;
+  if (statNo) statNo.textContent = noInCat;
+  if (dictYes) dictYes.textContent = yesInCat;
+  if (dictNo) dictNo.textContent = noInCat;
+  return { yesInCat, noInCat };
+}
+
+function renderDialogue() {
+  const dlg = currentDialogue();
+  document.getElementById('dlgTitle').textContent = dlg.title;
+  document.getElementById('dlgDesc').textContent = dlg.desc;
+  document.getElementById('dlgEyebrow').textContent = 'ESCENARIO · ' + currentLevel().tag;
+
+  const turnsEl = document.getElementById('dlgTurns');
+  turnsEl.innerHTML = '';
+
+  // Assign speaker roles (A/B)
+  const seen = {};
+  let nextIdx = 0;
+  const turns = dlg.turns.map(t => {
+    if (!(t.speaker in seen)) seen[t.speaker] = nextIdx++;
+    return { ...t, role: seen[t.speaker] };
+  });
+
+  turns.forEach((turn, idx) => {
+    const el = document.createElement('div');
+    el.className = 'turn' + (turn.role === 1 ? ' speaker-b' : '');
+    if (dialogueState.revealed) el.classList.add('revealed');
+    el.dataset.role = turn.role;
+    el.dataset.idx = idx;
+    el.dataset.text = turn.en;
+    el.innerHTML = `
+      <div class="turn-header">
+        <span class="turn-speaker">${escapeHtml(turn.speaker)}</span>
+        <button class="turn-play" title="Reproducir" aria-label="Reproducir turno">
+          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20 7 4"/></svg>
+        </button>
+      </div>
+      <div class="turn-en">${escapeHtml(turn.en)}</div>
+      <div class="turn-es">${escapeHtml(turn.es)}</div>
+    `;
+
+    // Click on turn body toggles reveal
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.turn-play')) return;
+      el.classList.toggle('revealed');
+    });
+    // Play button
+    el.querySelector('.turn-play').addEventListener('click', (e) => {
+      e.stopPropagation();
+      stopPlayAll();
+      playTurn(turn.en, turn.role, el);
+    });
+
+    turnsEl.appendChild(el);
+  });
+
+  document.getElementById('revealAllLabel').textContent =
+    dialogueState.revealed ? 'Ocultar traducciones' : 'Mostrar traducciones';
+}
+
+function render() {
+  renderModes();
+
+  const isDialogue = state.mode === 'dialogues';
+
+  // Show/hide practice toggle and progress based on mode
+  document.getElementById('practiceRow').style.display = isDialogue ? 'none' : 'flex';
+  document.getElementById('progressRow').style.display = isDialogue ? 'none' : 'flex';
+  document.getElementById('progressBarWrap').style.display = isDialogue ? 'none' : 'block';
+
+  renderPracticeToggle();
+  renderLevels();
+  renderCategories();
+
+  if (isDialogue) {
+    // Dialogue mode: single view
+    document.getElementById('cardView').style.display = 'none';
+    document.getElementById('dictView').style.display = 'none';
+    document.getElementById('completeView').style.display = 'none';
+    document.getElementById('dialogueView').style.display = 'block';
+    renderDialogue();
+    return;
+  }
+
+  document.getElementById('dialogueView').style.display = 'none';
+
+  const deck = currentDeck();
+  const complete = state.index >= deck.length;
+
+  document.getElementById('cardView').style.display =
+    (!complete && state.practiceMode === 'card') ? 'block' : 'none';
+  document.getElementById('dictView').style.display =
+    (!complete && state.practiceMode === 'dictation') ? 'block' : 'none';
+  document.getElementById('completeView').style.display = complete ? 'block' : 'none';
+
+  const total = deck.length;
+  const shown = Math.min(state.index, total);
+  document.getElementById('counter').textContent = `${shown} / ${total}`;
+  document.getElementById('progressFill').style.width = total ? `${(shown / total) * 100}%` : '0%';
+
+  const { yesInCat, noInCat } = updateStats();
+
+  if (complete) {
+    document.getElementById('finalYes').textContent = yesInCat;
+    document.getElementById('finalNo').textContent = noInCat;
+    const totalAns = yesInCat + noInCat;
+    const pct = totalAns ? Math.round((yesInCat / totalAns) * 100) : 0;
+    document.getElementById('finalPct').textContent = pct + '%';
+    document.getElementById('reviewBtn').style.display = noInCat > 0 ? '' : 'none';
+    return;
+  }
+
+  const card = deck[state.index];
+  const catLabel = state.reviewMode
+    ? 'Repaso · ' + currentCategories()[state.category].label
+    : currentCategories()[state.category].label;
+
+  if (state.practiceMode === 'card') {
+    document.getElementById('frontCategory').textContent = catLabel;
+    document.getElementById('backCategory').textContent = catLabel;
+    renderCardFaces(card);
+    document.getElementById('cardIndex').textContent =
+      String(state.index + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+    document.getElementById('card').classList.toggle('flipped', state.flipped);
+    document.getElementById('prevBtn').disabled = state.index === 0;
+    document.getElementById('nextBtn').disabled = state.index >= deck.length - 1;
+  } else {
+    document.getElementById('dictCategory').textContent = catLabel;
+    document.getElementById('dictIndex').textContent =
+      String(state.index + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+  }
+}
+
+// ============================================================
+//  CARD MODE ACTIONS
+// ============================================================
+function switchMode(newMode) {
+  if (newMode === state.mode) return;
+  stopPlayAll();
+  state.mode = newMode;
+  const dataset = currentDataset();
+  if (!dataset[state.level]) state.level = Object.keys(dataset)[0];
+  state.category = Object.keys(dataset[state.level].categories)[0];
+  state.index = 0;
+  state.flipped = false;
+  state.reviewMode = false;
+  state.reviewDeck = [];
+  dialogueState.revealed = false;
+  resetDictation();
+  render();
+  if (state.mode !== 'dialogues' && state.practiceMode === 'dictation') autoPlayDictation();
+  saveState();
+}
+
+function switchPracticeMode(newMode) {
+  if (newMode === state.practiceMode) return;
+  state.practiceMode = newMode;
+  state.index = 0;
+  state.flipped = false;
+  resetDictation();
+  render();
+  if (newMode === 'dictation') autoPlayDictation();
+  saveState();
+}
+
+function flip() { state.flipped = !state.flipped; render(); }
+function next() {
+  const deck = currentDeck();
+  if (state.index < deck.length) { state.index++; state.flipped = false; render(); }
+}
+function prev() {
+  if (state.index > 0) { state.index--; state.flipped = false; render(); }
+}
+function markYes() {
+  const deck = currentDeck();
+  if (state.index >= deck.length) return;
+  const k = keyFor(deck[state.index]);
+  state.yes.add(k); state.no.delete(k);
+  advance();
+}
+function markNo() {
+  const deck = currentDeck();
+  if (state.index >= deck.length) return;
+  const k = keyFor(deck[state.index]);
+  state.no.add(k); state.yes.delete(k);
+  advance();
+}
+function advance() { state.index++; state.flipped = false; render(); saveState(); }
+
+function speak() {
+  const deck = currentDeck();
+  if (state.index >= deck.length) return;
+  const text = deck[state.index].en.replace(/___+/g, 'blank');
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = state.mode === 'phrases' ? 0.9 : 0.85;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+// ============================================================
+//  DICTATION MODE ACTIONS
+// ============================================================
+function resetDictation() {
+  dictationState.answered = false;
+  dictationState.wasCorrect = false;
+  const input = document.getElementById('dictInput');
+  if (input) {
+    input.value = '';
+    input.disabled = false;
+    input.classList.remove('correct', 'wrong');
+  }
+  const feedback = document.getElementById('dictFeedback');
+  if (feedback) { feedback.className = 'dict-feedback'; feedback.innerHTML = ''; }
+  const check = document.getElementById('dictCheck');
+  if (check) check.textContent = 'Verificar';
+}
+
+function playDictation() {
+  const deck = currentDeck();
+  if (state.index >= deck.length) return;
+  const text = deck[state.index].en;
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = 0.8;
+    const playBtn = document.getElementById('dictPlay');
+    playBtn.classList.add('playing');
+    u.onend = () => playBtn.classList.remove('playing');
+    u.onerror = () => playBtn.classList.remove('playing');
+    window.speechSynthesis.speak(u);
+  }
+  const input = document.getElementById('dictInput');
+  if (input && !input.disabled) input.focus();
+}
+
+function autoPlayDictation() {
+  setTimeout(() => {
+    if (state.mode === 'dialogues') return;
+    if (state.practiceMode !== 'dictation') return;
+    if (state.index >= currentDeck().length) return;
+    playDictation();
+  }, 350);
+}
+
+function checkDictation() {
+  if (dictationState.answered) { advanceDictation(); return; }
+  const input = document.getElementById('dictInput');
+  const userText = input.value;
+  if (!userText.trim()) { input.focus(); return; }
+
+  const deck = currentDeck();
+  const card = deck[state.index];
+  const correct = normalizeAnswer(userText) === normalizeAnswer(card.en);
+
+  dictationState.answered = true;
+  dictationState.wasCorrect = correct;
+  input.classList.add(correct ? 'correct' : 'wrong');
+  input.disabled = true;
+
+  const feedback = document.getElementById('dictFeedback');
+  feedback.className = 'dict-feedback show ' + (correct ? 'correct' : 'wrong');
+  if (correct) {
+    feedback.innerHTML = '✓ ¡Correcto!';
+  } else {
+    feedback.innerHTML = `
+      ✗ No es correcto
+      <span class="label">Tu respuesta</span>
+      <span class="your-answer">${escapeHtml(userText)}</span>
+      <span class="label">Respuesta correcta</span>
+      <span class="correct-answer">${escapeHtml(card.en)}</span>
+    `;
+  }
+  document.getElementById('dictCheck').textContent = 'Siguiente →';
+
+  const k = keyFor(card);
+  if (correct) { state.yes.add(k); state.no.delete(k); }
+  else { state.no.add(k); state.yes.delete(k); }
+  updateStats(); saveState();
+}
+
+function advanceDictation() {
+  state.index++;
+  resetDictation();
+  render();
+  if (state.index < currentDeck().length) autoPlayDictation();
+}
+
+function replayDictation() { playDictation(); }
+
+// ============================================================
+//  DIALOGUE MODE ACTIONS
+// ============================================================
+function playTurn(text, role, turnEl) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  document.querySelectorAll('.turn.playing').forEach(t => t.classList.remove('playing'));
+  if (turnEl) turnEl.classList.add('playing');
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  u.pitch = role === 0 ? 1.1 : 0.85;
+  u.onend = () => { if (turnEl) turnEl.classList.remove('playing'); };
+  u.onerror = () => { if (turnEl) turnEl.classList.remove('playing'); };
+  window.speechSynthesis.speak(u);
+}
+
+function playAll() {
+  if (dialogueState.isPlayingAll) { stopPlayAll(); return; }
+  const turns = Array.from(document.querySelectorAll('.turn'));
+  if (!turns.length) return;
+  dialogueState.isPlayingAll = true;
+  dialogueState.playIdx = 0;
+  const btn = document.getElementById('btnPlayAll');
+  btn.classList.add('playing');
+  document.getElementById('playAllLabel').textContent = 'Detener';
+  playNextInQueue(turns);
+}
+
+function playNextInQueue(turns) {
+  if (!dialogueState.isPlayingAll || dialogueState.playIdx >= turns.length) {
+    stopPlayAll();
+    return;
+  }
+  const turnEl = turns[dialogueState.playIdx];
+  document.querySelectorAll('.turn.playing').forEach(t => t.classList.remove('playing'));
+  turnEl.classList.add('playing');
+  try {
+    turnEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (e) { /* ignore */ }
+
+  const text = turnEl.dataset.text;
+  const role = parseInt(turnEl.dataset.role || '0');
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  u.pitch = role === 0 ? 1.1 : 0.85;
+  u.onend = () => {
+    if (!dialogueState.isPlayingAll) return;
+    dialogueState.playIdx++;
+    setTimeout(() => playNextInQueue(turns), 450);
+  };
+  u.onerror = () => {
+    if (!dialogueState.isPlayingAll) return;
+    dialogueState.playIdx++;
+    setTimeout(() => playNextInQueue(turns), 100);
+  };
+  window.speechSynthesis.speak(u);
+}
+
+function stopPlayAll() {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  dialogueState.isPlayingAll = false;
+  dialogueState.playIdx = 0;
+  const btn = document.getElementById('btnPlayAll');
+  if (btn) btn.classList.remove('playing');
+  const label = document.getElementById('playAllLabel');
+  if (label) label.textContent = 'Reproducir todo';
+  document.querySelectorAll('.turn.playing').forEach(t => t.classList.remove('playing'));
+}
+
+function toggleRevealAll() {
+  dialogueState.revealed = !dialogueState.revealed;
+  document.querySelectorAll('.turn').forEach(t => {
+    t.classList.toggle('revealed', dialogueState.revealed);
+  });
+  document.getElementById('revealAllLabel').textContent =
+    dialogueState.revealed ? 'Ocultar traducciones' : 'Mostrar traducciones';
+}
+
+// ============================================================
+//  RESTART / REVIEW
+// ============================================================
+function restart() {
+  state.index = 0;
+  state.flipped = false;
+  state.reviewMode = false;
+  state.reviewDeck = [];
+  const prefix = `${state.mode}:${state.level}:${state.category}:`;
+  state.yes = new Set([...state.yes].filter(k => !k.startsWith(prefix)));
+  state.no = new Set([...state.no].filter(k => !k.startsWith(prefix)));
+  resetDictation();
+  render();
+  if (state.practiceMode === 'dictation') autoPlayDictation();
+  saveState();
+}
+
+function reviewFailed() {
+  const prefix = `${state.mode}:${state.level}:${state.category}:`;
+  const failedKeys = [...state.no].filter(k => k.startsWith(prefix));
+  const items = currentCategories()[state.category].items || [];
+  const failedItems = items.filter(w => failedKeys.includes(prefix + w.en));
+  if (!failedItems.length) return;
+  state.reviewMode = true;
+  state.reviewDeck = failedItems;
+  state.index = 0;
+  state.flipped = false;
+  failedKeys.forEach(k => state.no.delete(k));
+  resetDictation();
+  render();
+  if (state.practiceMode === 'dictation') autoPlayDictation();
+}
+
+// ============================================================
+//  WIRE UP
+// ============================================================
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+});
+document.querySelectorAll('.practice-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => switchPracticeMode(btn.dataset.practice));
+});
+document.getElementById('card').addEventListener('click', (e) => {
+  if (e.target.closest('.speak-btn')) return;
+  flip();
+});
+document.getElementById('speakBtn').addEventListener('click', (e) => { e.stopPropagation(); speak(); });
+document.getElementById('btnFlip').addEventListener('click', flip);
+document.getElementById('btnYes').addEventListener('click', markYes);
+document.getElementById('btnNo').addEventListener('click', markNo);
+document.getElementById('prevBtn').addEventListener('click', prev);
+document.getElementById('nextBtn').addEventListener('click', next);
+document.getElementById('restartBtn').addEventListener('click', restart);
+document.getElementById('reviewBtn').addEventListener('click', reviewFailed);
+
+// Dictation
+document.getElementById('dictPlay').addEventListener('click', replayDictation);
+document.getElementById('dictCheck').addEventListener('click', checkDictation);
+document.getElementById('dictInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); checkDictation(); }
+});
+
+// Dialogue
+document.getElementById('btnPlayAll').addEventListener('click', playAll);
+document.getElementById('btnRevealAll').addEventListener('click', toggleRevealAll);
+
+// Global keyboard
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  if (state.mode === 'dialogues') {
+    if (e.code === 'Space') { e.preventDefault(); playAll(); }
+    else if (e.key.toLowerCase() === 'r') toggleRevealAll();
+    return;
+  }
+  if (state.practiceMode === 'dictation') {
+    if (e.key.toLowerCase() === 's' || e.code === 'Space') { e.preventDefault(); replayDictation(); }
+    return;
+  }
+  if (e.code === 'Space') { e.preventDefault(); flip(); }
+  else if (e.key === 'ArrowRight') next();
+  else if (e.key === 'ArrowLeft') prev();
+  else if (e.key === '1') markNo();
+  else if (e.key === '2') markYes();
+  else if (e.key.toLowerCase() === 's') speak();
+});
+
+// ============================================================
+//  BOOT
+// ============================================================
+(async function init() {
+  await loadState();
+  render();
+  if (state.mode !== 'dialogues' && state.practiceMode === 'dictation') autoPlayDictation();
+})();
+</script>
+</body>
+</html>
